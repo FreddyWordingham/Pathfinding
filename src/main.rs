@@ -1,10 +1,24 @@
-use std::ops::Range;
-
-use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
-use bevy::diagnostic::LogDiagnosticsPlugin;
-use bevy::{math::vec2, prelude::*, window::close_on_esc, window::WindowResolution};
-
+use bevy::{
+    math::{ivec3, vec2},
+    prelude::*,
+    window::{PrimaryWindow, WindowResolution},
+};
 use bevy_simple_tilemap::prelude::*;
+
+const MAP_WIDTH: i32 = 10;
+const MAP_HEIGHT: i32 = 10;
+
+const TILE_WIDTH: f32 = 16.0;
+const TILE_HEIGHT: f32 = TILE_WIDTH;
+const SCALE: f32 = 1.0;
+
+/// Cursor location on the tilemap
+#[derive(Resource, Default)]
+struct CursorTileCoords(IVec2);
+
+/// Used to help identify the main camera
+#[derive(Component)]
+struct MainCamera;
 
 fn main() {
     App::new()
@@ -20,13 +34,36 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest()),
         )
-        .add_plugins(FrameTimeDiagnosticsPlugin::default())
+        // .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin::default())
+        // .add_plugins(bevy::diagnostic::LogDiagnosticsPlugin::default())
         .add_plugins(SimpleTileMapPlugin)
         .add_systems(Startup, setup)
-        .add_systems(Update, (input_system, update_tiles_system))
-        .add_systems(Update, close_on_esc)
-        .add_plugins(LogDiagnosticsPlugin::default())
+        .add_systems(Update, input_system)
+        .add_systems(Update, change_system)
+        .init_resource::<CursorTileCoords>()
+        .add_systems(Update, update_cursor_tile_coords)
+        .add_systems(Update, bevy::window::close_on_esc)
         .run();
+}
+
+fn update_cursor_tile_coords(
+    mut cursor_tile_coords: ResMut<CursorTileCoords>,
+    q_window: Query<&Window, With<PrimaryWindow>>,
+    q_camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+) {
+    let (camera, camera_transform) = q_camera.single();
+    let window = q_window.single();
+
+    if let Some(world_position) = window
+        .cursor_position()
+        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+        .map(|ray| ray.origin.truncate())
+    {
+        let tile_x = ((world_position.x / TILE_WIDTH) + (SCALE * 0.5)) as i32;
+        let tile_y = ((world_position.y / TILE_HEIGHT) + (SCALE * 0.5)) as i32;
+        cursor_tile_coords.0 = IVec2::new(tile_x, tile_y);
+        eprintln!("Tile Location: {:?}", cursor_tile_coords.0);
+    }
 }
 
 fn input_system(
@@ -35,8 +72,8 @@ fn input_system(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
 ) {
-    const MOVE_SPEED: f32 = 1000.0;
-    const ZOOM_SPEED: f32 = 10.0;
+    const MOVE_SPEED: f32 = 100.0;
+    const ZOOM_SPEED: f32 = 2.0;
 
     if let Some(mut tf) = camera_transform_query.iter_mut().next() {
         if keyboard_input.pressed(KeyCode::KeyX) {
@@ -70,42 +107,20 @@ fn input_system(
     }
 }
 
-fn update_tiles_system(mut query: Query<&mut TileMap>, mut count: Local<u32>) {
-    const WIDTH: i32 = 1024;
-    const HEIGHT: i32 = 1024;
+fn change_system(mut query: Query<&mut TileMap>, mut counter: Local<u32>) {
+    let mut tilemap = query.iter_mut().next().unwrap();
 
-    const X_RANGE: Range<i32> = -(WIDTH / 2)..(WIDTH / 2);
-    const Y_RANGE: Range<i32> = -(HEIGHT / 2)..(HEIGHT / 2);
+    *counter += 1;
+    let mut tiles: Vec<(IVec3, Option<Tile>)> = Vec::with_capacity((1 * 1) as usize);
+    tiles.push((
+        ivec3(*counter as i32, 0, 0),
+        Some(Tile {
+            sprite_index: (*counter % 4) as u32,
+            ..Default::default()
+        }),
+    ));
 
-    *count += 1;
-
-    for mut tilemap in query.iter_mut() {
-        // List to store set tile operations
-        let mut tiles: Vec<(IVec3, Option<Tile>)> = Vec::with_capacity((WIDTH * HEIGHT) as usize);
-
-        let mut i = *count % 4;
-
-        for y in Y_RANGE {
-            // let sprite_index = i % 4;
-            let sprite_index = 0;
-
-            for x in X_RANGE {
-                // Add tile change to list
-                tiles.push((
-                    IVec3::new(x, y, 0),
-                    Some(Tile {
-                        sprite_index,
-                        ..Default::default()
-                    }),
-                ));
-            }
-
-            i += 1;
-        }
-
-        // Perform tile update
-        tilemap.set_tiles(tiles);
-    }
+    tilemap.set_tiles(tiles);
 }
 
 fn setup(
@@ -113,20 +128,43 @@ fn setup(
     mut commands: Commands,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    // Load tilesheet texture and make a texture atlas from it
     let texture = asset_server.load("textures/tilesheet.png");
-    let atlas = TextureAtlasLayout::from_grid(vec2(16.0, 16.0), 4, 1, Some(vec2(1.0, 1.0)), None);
+    let atlas = TextureAtlasLayout::from_grid(
+        vec2(TILE_WIDTH, TILE_HEIGHT),
+        4,
+        1,
+        Some(vec2(1.0, 1.0)),
+        None,
+    );
     let texture_atlas = texture_atlases.add(atlas);
+
+    let total_tiles = MAP_WIDTH * MAP_HEIGHT;
+    let mut tiles = Vec::with_capacity(total_tiles as usize);
+    for x in 0..MAP_WIDTH {
+        for y in 0..MAP_HEIGHT {
+            tiles.push((
+                ivec3(x, y, 0),
+                Some(Tile {
+                    sprite_index: 0,
+                    ..Default::default()
+                }),
+            ));
+        }
+    }
+
+    let mut tilemap = TileMap::default();
+    tilemap.set_tiles(tiles);
 
     // Set up tilemap
     let tilemap_bundle = TileMapBundle {
+        tilemap,
         texture,
         atlas: TextureAtlas {
             layout: texture_atlas,
             ..Default::default()
         },
         transform: Transform {
-            scale: Vec3::splat(1.0),
+            scale: Vec3::splat(SCALE),
             translation: Vec3::new(0.0, 0.0, 0.0),
             ..Default::default()
         },
@@ -134,7 +172,7 @@ fn setup(
     };
 
     // Spawn camera
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((Camera2dBundle::default(), MainCamera));
 
     // Spawn tilemap
     commands.spawn(tilemap_bundle);
