@@ -8,6 +8,7 @@ bevy = "0.13.2"
 bevy_simple_tilemap = "0.14.0"
 ndarray = "0.15.6"
 pathfinding = "4.9.1"
+rand = "0.8.5"
 
 [workspace]
 resolver = "2"

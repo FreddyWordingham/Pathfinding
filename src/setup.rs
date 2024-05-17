@@ -3,6 +3,8 @@ use bevy::{
     prelude::*,
 };
 use bevy_simple_tilemap::prelude::*;
+use ndarray::Array2;
+use rand::random;
 
 use crate::prelude::*;
 
@@ -10,13 +12,25 @@ pub fn setup(
     asset_server: Res<AssetServer>,
     mut commands: Commands,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
+    mut map: ResMut<Map>,
 ) {
+    *map = Map(generate_map());
     spawn_camera(&mut commands);
     let texture = load_tilemap_texture(&asset_server);
     let texture_atlas = create_texture_atlas(&mut texture_atlases);
-    let tiles = generate_initial_tiles();
+    let tiles = generate_initial_tiles(&map);
     let tilemap = create_tilemap(tiles);
     spawn_tilemap(&mut commands, tilemap, texture, texture_atlas);
+}
+
+fn generate_map() -> Array2<i32> {
+    let mut map = Array2::from_elem([MAP_WIDTH as usize, MAP_HEIGHT as usize], 0);
+    for _ in 0..1000 {
+        let x = random::<usize>() % MAP_WIDTH as usize;
+        let y = random::<usize>() % MAP_HEIGHT as usize;
+        map[[x, y]] = 1;
+    }
+    map
 }
 
 fn spawn_camera(commands: &mut Commands) {
@@ -51,14 +65,19 @@ fn create_texture_atlas(
     texture_atlases.add(atlas)
 }
 
-fn generate_initial_tiles() -> Vec<(IVec3, Option<Tile>)> {
+fn generate_initial_tiles(map: &Map) -> Vec<(IVec3, Option<Tile>)> {
     let mut tiles = Vec::with_capacity(MAP_TILE_COUNT as usize);
     for x in 0..MAP_WIDTH {
         for y in 0..MAP_HEIGHT {
+            let index = match map.0[[x as usize, y as usize]] {
+                0 => 5,
+                _ => 3,
+            };
+
             tiles.push((
                 ivec3(x, y, MAP_LAYER_FLOOR),
                 Some(Tile {
-                    sprite_index: 1,
+                    sprite_index: index,
                     ..Default::default()
                 }),
             ));

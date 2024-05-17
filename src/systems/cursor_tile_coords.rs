@@ -33,7 +33,7 @@ pub fn highlight_active_tile_coords(
     tilemap.set_tile(
         previous_cursor_tile_coords.extend(MAP_LAYER_HIGHLIGHTING),
         Some(Tile {
-            sprite_index: 1,
+            sprite_index: 0,
             ..Default::default()
         }),
     );
@@ -42,9 +42,37 @@ pub fn highlight_active_tile_coords(
     tilemap.set_tile(
         cursor_tile_coords.0.extend(MAP_LAYER_HIGHLIGHTING),
         Some(Tile {
-            sprite_index: 0,
+            sprite_index: 1,
             ..Default::default()
         }),
     );
     *previous_cursor_tile_coords = cursor_tile_coords.0;
+}
+
+pub fn set_active_tile_coords_to_something(
+    cursor_tile_coords: Res<CursorTileCoords>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut query: Query<&mut TileMap>,
+) {
+    if keyboard_input.pressed(KeyCode::KeyX) {
+        let mut tilemap = query.single_mut();
+
+        tilemap.set_tile(
+            cursor_tile_coords.0.extend(MAP_LAYER_FLOOR),
+            Some(Tile {
+                sprite_index: 3,
+                ..Default::default()
+            }),
+        );
+    } else if keyboard_input.pressed(KeyCode::KeyZ) {
+        let mut tilemap = query.single_mut();
+
+        tilemap.set_tile(
+            cursor_tile_coords.0.extend(MAP_LAYER_FLOOR),
+            Some(Tile {
+                sprite_index: 5,
+                ..Default::default()
+            }),
+        );
+    }
 }

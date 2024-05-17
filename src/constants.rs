@@ -2,7 +2,7 @@ use bevy::{math::vec2, prelude::*};
 
 // Map
 pub const TILEMAP_IMAGE: &str = "atlas.png";
-pub const TILEMAP_COLUMNS: usize = 4;
+pub const TILEMAP_COLUMNS: usize = 7;
 pub const TILEMAP_ROWS: usize = 1;
 pub const TILEMAP_PADDING: Option<Vec2> = Some(vec2(1.0, 1.0));
 pub const TILEMAP_OFFSET: Option<Vec2> = None;

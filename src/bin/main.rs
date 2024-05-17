@@ -20,12 +20,17 @@ fn main() {
         // .add_plugins(bevy::diagnostic::LogDiagnosticsPlugin::default())
         .add_plugins(SimpleTileMapPlugin)
         .init_resource::<CursorTileCoords>()
+        .init_resource::<Map>()
         .add_systems(Startup, setup)
         .add_systems(Update, bevy::window::close_on_esc)
         .add_systems(Update, (camera_movement, update_cursor_tile_coords))
         .add_systems(
             Update,
-            (report_cursor_tile_coords, highlight_active_tile_coords)
+            (
+                report_cursor_tile_coords,
+                highlight_active_tile_coords,
+                set_active_tile_coords_to_something,
+            )
                 .after(update_cursor_tile_coords),
         )
         .run();
