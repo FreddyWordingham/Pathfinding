@@ -19,8 +19,14 @@ fn main() {
         // .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin::default())
         // .add_plugins(bevy::diagnostic::LogDiagnosticsPlugin::default())
         .add_plugins(SimpleTileMapPlugin)
+        .init_resource::<CursorTileCoords>()
         .add_systems(Startup, setup)
         .add_systems(Update, bevy::window::close_on_esc)
-        .add_systems(Update, camera_movement)
+        .add_systems(Update, (camera_movement, update_cursor_tile_coords))
+        .add_systems(
+            Update,
+            (report_cursor_tile_coords, highlight_active_tile_coords)
+                .after(update_cursor_tile_coords),
+        )
         .run();
 }

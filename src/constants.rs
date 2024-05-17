@@ -10,9 +10,13 @@ pub const TILE_WIDTH: f32 = 16.0;
 pub const TILE_HEIGHT: f32 = TILE_WIDTH;
 pub const TILEMAP_SCALE: f32 = 1.0;
 
-pub const MAP_WIDTH: i32 = 8;
-pub const MAP_HEIGHT: i32 = 6;
+pub const MAP_WIDTH: i32 = 80;
+pub const MAP_HEIGHT: i32 = 60;
 pub const MAP_TILE_COUNT: i32 = MAP_WIDTH * MAP_HEIGHT;
+
+// Map layers
+pub const MAP_LAYER_FLOOR: i32 = 0;
+pub const MAP_LAYER_HIGHLIGHTING: i32 = 1;
 
 // Camera
 pub const CAMERA_MOVE_SPEED: f32 = 100.0;

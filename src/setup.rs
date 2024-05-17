@@ -21,14 +21,17 @@ pub fn setup(
 
 fn spawn_camera(commands: &mut Commands) {
     // Spawn camera at center of map
-    commands.spawn(Camera2dBundle {
-        transform: Transform::from_translation(Vec3::new(
-            (MAP_WIDTH as f32 * TILE_WIDTH) / 2.0,
-            (MAP_HEIGHT as f32 * TILE_HEIGHT) / 2.0,
-            1.0,
-        )),
-        ..Default::default()
-    });
+    commands.spawn((
+        Camera2dBundle {
+            transform: Transform::from_translation(Vec3::new(
+                (MAP_WIDTH as f32 * TILE_WIDTH) / 2.0,
+                (MAP_HEIGHT as f32 * TILE_HEIGHT) / 2.0,
+                1.0,
+            )),
+            ..Default::default()
+        },
+        MainCamera,
+    ));
 }
 
 fn load_tilemap_texture(asset_server: &AssetServer) -> Handle<Image> {
@@ -53,9 +56,9 @@ fn generate_initial_tiles() -> Vec<(IVec3, Option<Tile>)> {
     for x in 0..MAP_WIDTH {
         for y in 0..MAP_HEIGHT {
             tiles.push((
-                ivec3(x, y, 0),
+                ivec3(x, y, MAP_LAYER_FLOOR),
                 Some(Tile {
-                    sprite_index: 0,
+                    sprite_index: 1,
                     ..Default::default()
                 }),
             ));
