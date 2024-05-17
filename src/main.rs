@@ -1,179 +1,67 @@
-use bevy::{
-    math::{ivec3, vec2},
-    prelude::*,
-    window::{PrimaryWindow, WindowResolution},
-};
-use bevy_simple_tilemap::prelude::*;
+use ndarray::Array2;
+use pathfinding::prelude::*;
 
-const MAP_WIDTH: i32 = 10;
-const MAP_HEIGHT: i32 = 10;
+// Define the function to convert the grid to a pathfinding-compatible format
+fn neighbors(pos: (usize, usize), grid: &Array2<i32>) -> Vec<((usize, usize), i32)> {
+    let (x, y) = pos;
+    let mut result = Vec::new();
 
-const TILE_WIDTH: f32 = 16.0;
-const TILE_HEIGHT: f32 = TILE_WIDTH;
-const SCALE: f32 = 1.0;
+    let directions = [
+        (1, 0),  // Right
+        (0, 1),  // Down
+        (-1, 0), // Left
+        (0, -1), // Up
+    ];
 
-/// Cursor location on the tilemap
-#[derive(Resource, Default)]
-struct CursorTileCoords(IVec2);
+    for &(dx, dy) in &directions {
+        let nx = x as isize + dx;
+        let ny = y as isize + dy;
+        if nx >= 0 && nx < grid.nrows() as isize && ny >= 0 && ny < grid.ncols() as isize {
+            let cost = grid[(nx as usize, ny as usize)];
+            result.push(((nx as usize, ny as usize), cost));
+        }
+    }
 
-/// Used to help identify the main camera
-#[derive(Component)]
-struct MainCamera;
+    result
+}
+
+// Define the heuristic function using the Manhattan distance
+fn heuristic(a: (usize, usize), b: (usize, usize)) -> i32 {
+    ((a.0 as isize - b.0 as isize).abs() + (a.1 as isize - b.1 as isize).abs()) as i32
+}
 
 fn main() {
-    App::new()
-        .add_plugins(
-            DefaultPlugins
-                .set(WindowPlugin {
-                    primary_window: Some(Window {
-                        resolution: WindowResolution::new(1280.0, 720.0)
-                            .with_scale_factor_override(1.0),
-                        ..Default::default()
-                    }),
-                    ..default()
-                })
-                .set(ImagePlugin::default_nearest()),
-        )
-        // .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin::default())
-        // .add_plugins(bevy::diagnostic::LogDiagnosticsPlugin::default())
-        .add_plugins(SimpleTileMapPlugin)
-        .add_systems(Startup, setup)
-        .add_systems(Update, input_system)
-        .add_systems(Update, change_system)
-        .init_resource::<CursorTileCoords>()
-        .add_systems(Update, update_cursor_tile_coords)
-        .add_systems(Update, bevy::window::close_on_esc)
-        .run();
-}
+    // Create a 2D ndarray grid
+    let grid: Array2<i32> = Array2::from_shape_vec(
+        (5, 5),
+        vec![
+            1, 1, 1, 1, 1, //
+            1, 5, 5, 5, 1, //
+            1, 5, 1, 1, 1, //
+            1, 1, 1, 5, 1, //
+            1, 1, 1, 1, 1, //
+        ],
+    )
+    .unwrap();
 
-fn update_cursor_tile_coords(
-    mut cursor_tile_coords: ResMut<CursorTileCoords>,
-    q_window: Query<&Window, With<PrimaryWindow>>,
-    q_camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-) {
-    let (camera, camera_transform) = q_camera.single();
-    let window = q_window.single();
+    // Define the start and end points
+    let start = (0, 0);
+    let goal = (4, 4);
 
-    if let Some(world_position) = window
-        .cursor_position()
-        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
-        .map(|ray| ray.origin.truncate())
-    {
-        let tile_x = ((world_position.x / TILE_WIDTH) + (SCALE * 0.5)) as i32;
-        let tile_y = ((world_position.y / TILE_HEIGHT) + (SCALE * 0.5)) as i32;
-        cursor_tile_coords.0 = IVec2::new(tile_x, tile_y);
-        eprintln!("Tile Location: {:?}", cursor_tile_coords.0);
-    }
-}
-
-fn input_system(
-    mut camera_transform_query: Query<&mut Transform, With<Camera2d>>,
-    mut tilemap_visible_query: Query<&mut Visibility, With<TileMap>>,
-    keyboard_input: Res<ButtonInput<KeyCode>>,
-    time: Res<Time>,
-) {
-    const MOVE_SPEED: f32 = 100.0;
-    const ZOOM_SPEED: f32 = 2.0;
-
-    if let Some(mut tf) = camera_transform_query.iter_mut().next() {
-        if keyboard_input.pressed(KeyCode::KeyX) {
-            tf.scale -= Vec3::splat(ZOOM_SPEED) * time.delta_seconds();
-        } else if keyboard_input.pressed(KeyCode::KeyZ) {
-            tf.scale += Vec3::splat(ZOOM_SPEED) * time.delta_seconds();
-        }
-
-        if keyboard_input.pressed(KeyCode::KeyA) {
-            tf.translation.x -= MOVE_SPEED * time.delta_seconds();
-        } else if keyboard_input.pressed(KeyCode::KeyD) {
-            tf.translation.x += MOVE_SPEED * time.delta_seconds();
-        }
-
-        if keyboard_input.pressed(KeyCode::KeyS) {
-            tf.translation.y -= MOVE_SPEED * time.delta_seconds();
-        } else if keyboard_input.pressed(KeyCode::KeyW) {
-            tf.translation.y += MOVE_SPEED * time.delta_seconds();
-        }
-
-        if keyboard_input.just_pressed(KeyCode::KeyV) {
-            // Toggle visibility
-            let mut visibility = tilemap_visible_query.iter_mut().next().unwrap();
-
-            if *visibility == Visibility::Hidden {
-                *visibility = Visibility::Visible;
-            } else {
-                *visibility = Visibility::Hidden;
-            }
-        }
-    }
-}
-
-fn change_system(mut query: Query<&mut TileMap>, mut counter: Local<u32>) {
-    let mut tilemap = query.iter_mut().next().unwrap();
-
-    *counter += 1;
-    let mut tiles: Vec<(IVec3, Option<Tile>)> = Vec::with_capacity((1 * 1) as usize);
-    tiles.push((
-        ivec3(*counter as i32, 0, 0),
-        Some(Tile {
-            sprite_index: (*counter % 4) as u32,
-            ..Default::default()
-        }),
-    ));
-
-    tilemap.set_tiles(tiles);
-}
-
-fn setup(
-    asset_server: Res<AssetServer>,
-    mut commands: Commands,
-    mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
-) {
-    let texture = asset_server.load("textures/tilesheet.png");
-    let atlas = TextureAtlasLayout::from_grid(
-        vec2(TILE_WIDTH, TILE_HEIGHT),
-        4,
-        1,
-        Some(vec2(1.0, 1.0)),
-        None,
+    // Run A-star algorithm to find the shortest path
+    let result = astar(
+        &start,
+        |&pos| neighbors(pos, &grid),
+        |&pos| heuristic(pos, goal),
+        |&pos| pos == goal,
     );
-    let texture_atlas = texture_atlases.add(atlas);
 
-    let total_tiles = MAP_WIDTH * MAP_HEIGHT;
-    let mut tiles = Vec::with_capacity(total_tiles as usize);
-    for x in 0..MAP_WIDTH {
-        for y in 0..MAP_HEIGHT {
-            tiles.push((
-                ivec3(x, y, 0),
-                Some(Tile {
-                    sprite_index: 0,
-                    ..Default::default()
-                }),
-            ));
+    match result {
+        Some((path, cost)) => {
+            println!("Found a path of cost {}: {:?}", cost, path);
+        }
+        None => {
+            println!("No path found");
         }
     }
-
-    let mut tilemap = TileMap::default();
-    tilemap.set_tiles(tiles);
-
-    // Set up tilemap
-    let tilemap_bundle = TileMapBundle {
-        tilemap,
-        texture,
-        atlas: TextureAtlas {
-            layout: texture_atlas,
-            ..Default::default()
-        },
-        transform: Transform {
-            scale: Vec3::splat(SCALE),
-            translation: Vec3::new(0.0, 0.0, 0.0),
-            ..Default::default()
-        },
-        ..Default::default()
-    };
-
-    // Spawn camera
-    commands.spawn((Camera2dBundle::default(), MainCamera));
-
-    // Spawn tilemap
-    commands.spawn(tilemap_bundle);
 }
