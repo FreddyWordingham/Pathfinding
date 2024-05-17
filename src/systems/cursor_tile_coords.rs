@@ -31,7 +31,7 @@ pub fn highlight_active_tile_coords(
 
     // Remove the highlight from the previous cursor tile
     tilemap.set_tile(
-        previous_cursor_tile_coords.extend(MAP_LAYER_HIGHLIGHTING),
+        previous_cursor_tile_coords.extend(MAP_LAYER_OVERLAY),
         Some(Tile {
             sprite_index: 0,
             ..Default::default()
@@ -40,9 +40,10 @@ pub fn highlight_active_tile_coords(
 
     // Highlight the new cursor tile
     tilemap.set_tile(
-        cursor_tile_coords.0.extend(MAP_LAYER_HIGHLIGHTING),
+        cursor_tile_coords.0.extend(MAP_LAYER_OVERLAY),
         Some(Tile {
-            sprite_index: 1,
+            sprite_index: 10,
+            color: Color::GOLD,
             ..Default::default()
         }),
     );
@@ -52,11 +53,12 @@ pub fn highlight_active_tile_coords(
 pub fn set_active_tile_coords_to_something(
     cursor_tile_coords: Res<CursorTileCoords>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut map: ResMut<Map>,
     mut query: Query<&mut TileMap>,
 ) {
     if keyboard_input.pressed(KeyCode::KeyX) {
+        // Set to floor
         let mut tilemap = query.single_mut();
-
         tilemap.set_tile(
             cursor_tile_coords.0.extend(MAP_LAYER_FLOOR),
             Some(Tile {
@@ -64,9 +66,13 @@ pub fn set_active_tile_coords_to_something(
                 ..Default::default()
             }),
         );
+        map.0[(
+            cursor_tile_coords.0.y as usize,
+            cursor_tile_coords.0.x as usize,
+        )] = 0;
     } else if keyboard_input.pressed(KeyCode::KeyZ) {
+        // Add a wall
         let mut tilemap = query.single_mut();
-
         tilemap.set_tile(
             cursor_tile_coords.0.extend(MAP_LAYER_FLOOR),
             Some(Tile {
@@ -74,5 +80,9 @@ pub fn set_active_tile_coords_to_something(
                 ..Default::default()
             }),
         );
+        map.0[(
+            cursor_tile_coords.0.y as usize,
+            cursor_tile_coords.0.x as usize,
+        )] = 1;
     }
 }

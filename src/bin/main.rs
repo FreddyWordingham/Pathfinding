@@ -21,17 +21,23 @@ fn main() {
         .add_plugins(SimpleTileMapPlugin)
         .init_resource::<CursorTileCoords>()
         .init_resource::<Map>()
+        .init_resource::<Start>()
+        .init_resource::<End>()
         .add_systems(Startup, setup)
         .add_systems(Update, bevy::window::close_on_esc)
-        .add_systems(Update, (camera_movement, update_cursor_tile_coords))
         .add_systems(
             Update,
             (
-                report_cursor_tile_coords,
-                highlight_active_tile_coords,
+                camera_movement,
+                update_cursor_tile_coords,
                 set_active_tile_coords_to_something,
-            )
-                .after(update_cursor_tile_coords),
+                set_active_tile_coords_to_start,
+                set_active_tile_coords_to_end,
+            ),
+        )
+        .add_systems(
+            Update,
+            (highlight_active_tile_coords, run_pathfinding).after(update_cursor_tile_coords),
         )
         .run();
 }

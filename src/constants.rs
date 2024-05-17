@@ -3,7 +3,7 @@ use bevy::{math::vec2, prelude::*};
 // Map
 pub const TILEMAP_IMAGE: &str = "atlas.png";
 pub const TILEMAP_COLUMNS: usize = 7;
-pub const TILEMAP_ROWS: usize = 1;
+pub const TILEMAP_ROWS: usize = 2;
 pub const TILEMAP_PADDING: Option<Vec2> = Some(vec2(1.0, 1.0));
 pub const TILEMAP_OFFSET: Option<Vec2> = None;
 pub const TILE_WIDTH: f32 = 16.0;
@@ -17,6 +17,10 @@ pub const MAP_TILE_COUNT: i32 = MAP_WIDTH * MAP_HEIGHT;
 // Map layers
 pub const MAP_LAYER_FLOOR: i32 = 0;
 pub const MAP_LAYER_HIGHLIGHTING: i32 = 1;
+pub const MAP_LAYER_PATH: i32 = 2;
+pub const MAP_LAYER_START: i32 = 3;
+pub const MAP_LAYER_END: i32 = 4;
+pub const MAP_LAYER_OVERLAY: i32 = 5;
 
 // Camera
 pub const CAMERA_MOVE_SPEED: f32 = 100.0;
