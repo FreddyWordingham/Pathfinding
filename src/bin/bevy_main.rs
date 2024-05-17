@@ -4,7 +4,6 @@ use bevy::{
     window::{PrimaryWindow, WindowResolution},
 };
 use bevy_simple_tilemap::prelude::*;
-use pathfinding;
 
 const MAP_WIDTH: i32 = 10;
 const MAP_HEIGHT: i32 = 10;
@@ -15,11 +14,7 @@ const SCALE: f32 = 1.0;
 
 /// The map of the game
 #[derive(Resource, Default)]
-struct Map {
-    width: i32,
-    height: i32,
-    tiles: Vec<Vec<i32>>,
-}
+struct Map {}
 
 /// Cursor location on the tilemap
 #[derive(Resource, Default)]
