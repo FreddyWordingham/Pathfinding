@@ -1,6 +1,10 @@
-# Pathfinding
+# Bevy Pathfinding Demo
 
-This is a small example of A\* pathfinding implemented in Bevy with an ECS tilemap.
+<p align="center">
+    <img src="./assets/icon.webp" alt="Bevy Pathfinding Demo" width="200" height="200"/>
+</p>
+
+Example of how to implement pathfinding in Bevy operating on a 2D tilemap.
 
 ## Overview
 
