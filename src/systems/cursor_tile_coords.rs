@@ -67,8 +67,8 @@ pub fn set_active_tile_coords_to_something(
             }),
         );
         map.0[(
-            cursor_tile_coords.0.y as usize,
             cursor_tile_coords.0.x as usize,
+            cursor_tile_coords.0.y as usize,
         )] = 0;
     } else if keyboard_input.pressed(KeyCode::KeyZ) {
         // Add a wall
@@ -81,8 +81,8 @@ pub fn set_active_tile_coords_to_something(
             }),
         );
         map.0[(
-            cursor_tile_coords.0.y as usize,
             cursor_tile_coords.0.x as usize,
+            cursor_tile_coords.0.y as usize,
         )] = 1;
     }
 }

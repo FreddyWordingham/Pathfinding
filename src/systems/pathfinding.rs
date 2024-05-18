@@ -84,8 +84,8 @@ pub fn set_active_tile_coords_to_end(
 pub fn run_pathfinding(
     map: Res<Map>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut start: ResMut<Start>,
-    mut end: ResMut<End>,
+    start: ResMut<Start>,
+    end: ResMut<End>,
     mut query: Query<&mut TileMap>,
     mut ready_to_run: Local<bool>,
 ) {
@@ -105,6 +105,7 @@ pub fn run_pathfinding(
         // Highlight the path
         match result {
             Some((path, cost)) => {
+                println!("Path found with cost {}", cost);
                 let mut tilemap = query.single_mut();
                 for (x, y) in path {
                     tilemap.set_tile(
