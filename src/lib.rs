@@ -1,5 +1,5 @@
-mod plugins;
+mod map;
 
 pub mod prelude {
-    pub use crate::plugins::MapPlugin;
+    pub use crate::map::*;
 }
