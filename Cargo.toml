@@ -5,7 +5,10 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.13.2"
+bevy-inspector-egui = "0.24.0"
+bevy_rand = { version = "0.6.0", features = ["wyrand"] }
 bevy_simple_tilemap = "0.14.0"
+bevy_tweening = "0.10.0"
 ndarray = "0.15.6"
 pathfinding = "4.9.1"
 rand = "0.8.5"

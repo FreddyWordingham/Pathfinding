@@ -5,14 +5,15 @@ pub const LAYER_FLOOR: i32 = 0;
 pub const LAYER_WALLS: i32 = 1;
 
 // Map
-pub const TILEMAP_IMAGE: &str = "atlas.png";
+pub const TILEMAP_IMAGE: &str = "textures/atlas.png";
 pub const TILEMAP_COLUMNS: usize = 10;
 pub const TILEMAP_ROWS: usize = 12;
 pub const TILEMAP_PADDING: Option<Vec2> = Some(vec2(1.0, 1.0));
 pub const TILEMAP_OFFSET: Option<Vec2> = None;
 pub const TILE_WIDTH: f32 = 32.0;
 pub const TILE_HEIGHT: f32 = TILE_WIDTH;
-pub const TILEMAP_SCALE: f32 = 1.0;
+pub const TILEMAP_SCALE: f32 = 2.0;
+pub const TILEMAP_TRANSLATION_Z: f32 = -100.0;
 
 // Glyphs
 pub const GLYPH_VOID: u32 = 0;

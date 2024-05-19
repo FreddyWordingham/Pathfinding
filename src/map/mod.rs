@@ -4,7 +4,6 @@ use bevy::{
 };
 use bevy_simple_tilemap::prelude::*;
 
-mod components;
 mod constants;
 mod events;
 mod map_builder;
@@ -40,7 +39,7 @@ fn setup(
 ) {
     // Initialise the map
     let map_builder =
-        MapBuilder::new_empty_box(vec2(TILE_WIDTH, TILE_HEIGHT), TILEMAP_SCALE, ivec2(10, 10));
+        MapBuilder::new_empty_box(vec2(TILE_WIDTH, TILE_HEIGHT), TILEMAP_SCALE, ivec2(30, 20));
     *map = map_builder.build();
 
     // Load the texture atlas
@@ -53,7 +52,7 @@ fn setup(
 }
 
 fn load_tilemap_texture(asset_server: &AssetServer) -> Handle<Image> {
-    asset_server.load(format!("{}/{}", "textures", TILEMAP_IMAGE))
+    asset_server.load(TILEMAP_IMAGE)
 }
 
 fn create_texture_atlas(
@@ -130,10 +129,10 @@ fn spawn_tilemap(
         },
         transform: Transform {
             scale: Vec3::splat(TILEMAP_SCALE),
-            translation: vec3(0.0, 0.0, 0.0),
+            translation: vec3(0.0, 0.0, TILEMAP_TRANSLATION_Z),
             ..Default::default()
         },
         ..Default::default()
     };
-    commands.spawn(tilemap_bundle);
+    commands.spawn((Name::new("Tilemap"), tilemap_bundle));
 }

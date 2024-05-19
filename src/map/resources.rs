@@ -22,8 +22,8 @@ pub struct Map {
 impl Default for Map {
     fn default() -> Self {
         Map {
-            tile_size: Vec2::new(32.0, 32.0),
-            tilemap_scale: 1.0,
+            tile_size: Vec2::new(TILE_WIDTH, TILE_HEIGHT),
+            tilemap_scale: TILEMAP_SCALE,
             floor_tiles: Array2::default((1, 1)),
             wall_tiles: Array2::default((1, 1)),
         }
@@ -41,16 +41,16 @@ impl Map {
 
     pub fn centre(&self) -> Vec2 {
         Vec2::new(
-            self.tile_size.x * self.wall_tiles.ncols() as f32 * 0.5,
-            self.tile_size.y * self.wall_tiles.nrows() as f32 * 0.5,
+            self.tile_size.x * self.wall_tiles.ncols() as f32 * self.tilemap_scale * 0.5,
+            self.tile_size.y * self.wall_tiles.nrows() as f32 * self.tilemap_scale * 0.5,
         )
     }
 
-    pub fn in_bounds(&self, position: IVec2) -> bool {
-        position.x >= 0
-            && position.x < self.wall_tiles.ncols() as i32
-            && position.y >= 0
-            && position.y < self.wall_tiles.nrows() as i32
+    pub fn in_bounds(&self, coords: IVec2) -> bool {
+        coords.x >= 0
+            && coords.x < self.wall_tiles.ncols() as i32
+            && coords.y >= 0
+            && coords.y < self.wall_tiles.nrows() as i32
     }
 
     pub fn is_wall(&self, position: IVec2) -> bool {
@@ -58,6 +58,27 @@ impl Map {
             return false;
         }
         self.wall_tiles[position_to_index(position)] == WallTileType::Wall
+    }
+
+    pub fn position_to_coords(&self, position: Vec2) -> Option<IVec2> {
+        let coords = ivec2(
+            (position.x / (self.tile_size.x * self.tilemap_scale)) as i32,
+            (position.y / (self.tile_size.y * self.tilemap_scale)) as i32,
+        );
+        if !self.in_bounds(coords) {
+            return None;
+        }
+        return Some(coords);
+    }
+
+    pub fn coords_to_position(&self, coords: IVec2) -> Option<Vec2> {
+        if !self.in_bounds(coords) {
+            return None;
+        }
+        return Some(Vec2::new(
+            coords.x as f32 * self.tile_size.x * self.tilemap_scale,
+            coords.y as f32 * self.tile_size.y * self.tilemap_scale,
+        ));
     }
 
     pub fn get_neighbours(&self, position: IVec2) -> Vec<IVec2> {
