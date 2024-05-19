@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
-use super::TileType;
+use super::WallTileType;
 
 #[derive(Event)]
 pub struct UpdateMapWallEvent {
     pub position: IVec2,
-    pub tile_type: TileType,
+    pub wall_tile_type: WallTileType,
 }

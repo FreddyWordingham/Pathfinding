@@ -1,18 +1,25 @@
 use bevy::{math::ivec2, prelude::*};
 use ndarray::Array2;
 
-use super::{constants::*, tile_types::TileType};
+use super::{
+    constants::*,
+    tile_types::{FloorTileType, WallTileType},
+};
 
 /// The map of the game
 #[derive(Resource)]
 pub struct Map {
-    pub tiles: Array2<TileType>,
+    pub tile_size: Vec2,
+    pub floor_tiles: Array2<FloorTileType>,
+    pub wall_tiles: Array2<WallTileType>,
 }
 
 impl Default for Map {
     fn default() -> Self {
         Map {
-            tiles: Array2::default((1, 1)),
+            tile_size: Vec2::new(32.0, 32.0),
+            floor_tiles: Array2::default((1, 1)),
+            wall_tiles: Array2::default((1, 1)),
         }
     }
 }
@@ -20,56 +27,35 @@ impl Default for Map {
 impl Map {
     pub fn in_bounds(&self, position: IVec2) -> bool {
         position.x >= 0
-            && position.x < self.tiles.ncols() as i32
+            && position.x < self.wall_tiles.ncols() as i32
             && position.y >= 0
-            && position.y < self.tiles.nrows() as i32
+            && position.y < self.wall_tiles.nrows() as i32
     }
 
     pub fn is_wall(&self, position: IVec2) -> bool {
         if !self.in_bounds(position) {
             return false;
         }
-        self.tiles[position_to_index(position)] == TileType::Wall
+        self.wall_tiles[position_to_index(position)] == WallTileType::Wall
     }
 
     pub fn get_neighbours(&self, position: IVec2) -> Vec<IVec2> {
-        let mut neighbours = Vec::new();
+        const DIRECTIONS: [IVec2; 8] = [
+            IVec2::new(0, 1),   // North
+            IVec2::new(1, 1),   // North-East
+            IVec2::new(1, 0),   // East
+            IVec2::new(1, -1),  // South-East
+            IVec2::new(0, -1),  // South
+            IVec2::new(-1, -1), // South-West
+            IVec2::new(-1, 0),  // West
+            IVec2::new(-1, 1),  // North-West
+        ];
 
-        let nn = position + ivec2(0, 1);
-        let ne = position + ivec2(1, 1);
-        let ee = position + ivec2(1, 0);
-        let se = position + ivec2(1, -1);
-        let ss = position + ivec2(0, -1);
-        let sw = position + ivec2(-1, -1);
-        let ww = position + ivec2(-1, 0);
-        let nw = position + ivec2(-1, 1);
-
-        if self.in_bounds(nn) {
-            neighbours.push(nn);
-        }
-        if self.in_bounds(ne) {
-            neighbours.push(ne);
-        }
-        if self.in_bounds(ee) {
-            neighbours.push(ee);
-        }
-        if self.in_bounds(se) {
-            neighbours.push(se);
-        }
-        if self.in_bounds(ss) {
-            neighbours.push(ss);
-        }
-        if self.in_bounds(sw) {
-            neighbours.push(sw);
-        }
-        if self.in_bounds(ww) {
-            neighbours.push(ww);
-        }
-        if self.in_bounds(nw) {
-            neighbours.push(nw);
-        }
-
-        neighbours
+        DIRECTIONS
+            .iter()
+            .map(|&dir| position + dir)
+            .filter(|&pos| self.in_bounds(pos))
+            .collect()
     }
 
     pub fn floor_tile_sprite_index(&self, position: IVec2) -> (u32, Color) {
@@ -81,17 +67,16 @@ impl Map {
     pub fn wall_tile_sprite_index(&self, position: IVec2) -> (u32, Color) {
         debug_assert!(self.in_bounds(position));
 
-        match self.tiles[position_to_index(position)] {
-            TileType::Void => (GLYPH_VOID, Color::WHITE),
-            TileType::Floor => (GLYPH_WALL_ENCLOSED, Color::DARK_GRAY),
-            TileType::Wall => (self.connected_wall_sprite_index(position), Color::WHITE),
+        match self.wall_tiles[position_to_index(position)] {
+            WallTileType::Empty => (GLYPH_WALL_ENCLOSED, Color::DARK_GRAY),
+            WallTileType::Wall => (self.connected_wall_sprite_index(position), Color::WHITE),
         }
     }
 
     pub fn connected_wall_sprite_index(&self, position: IVec2) -> u32 {
         debug_assert!(self.in_bounds(position));
 
-        if self.tiles[position_to_index(position)] != TileType::Wall {
+        if self.wall_tiles[position_to_index(position)] != WallTileType::Wall {
             return GLYPH_VOID;
         }
 

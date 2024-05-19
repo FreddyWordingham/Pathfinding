@@ -1,13 +1,24 @@
-/// Types of tiles in the map
+/// Types of tiles in the floor layer
 #[derive(Clone, PartialEq)]
-pub enum TileType {
-    Void,
-    Floor,
+pub enum FloorTileType {
+    Empty,
+}
+
+impl Default for FloorTileType {
+    fn default() -> Self {
+        FloorTileType::Empty
+    }
+}
+
+/// Types of tiles in the wall layer
+#[derive(Clone, PartialEq)]
+pub enum WallTileType {
+    Empty,
     Wall,
 }
 
-impl Default for TileType {
+impl Default for WallTileType {
     fn default() -> Self {
-        TileType::Floor
+        WallTileType::Empty
     }
 }

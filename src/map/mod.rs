@@ -1,5 +1,5 @@
 use bevy::{
-    math::{ivec2, ivec3, vec2},
+    math::{ivec2, ivec3, vec2, vec3},
     prelude::*,
 };
 use bevy_simple_tilemap::prelude::*;
@@ -17,7 +17,7 @@ pub use events::UpdateMapWallEvent;
 use map_builder::MapBuilder;
 pub use resources::Map;
 use systems::update_map_wall;
-pub use tile_types::TileType;
+pub use tile_types::{FloorTileType, WallTileType};
 
 pub struct MapPlugin;
 
@@ -38,7 +38,7 @@ fn setup(
     mut map: ResMut<Map>,
 ) {
     // Initialise the map
-    let map_builder = MapBuilder::new_empty_box(ivec2(100, 100));
+    let map_builder = MapBuilder::new_empty_box(vec2(TILE_WIDTH, TILE_HEIGHT), ivec2(100, 100));
     *map = map_builder.build();
 
     // Load the texture atlas
@@ -68,11 +68,10 @@ fn create_texture_atlas(
 }
 
 fn generate_initial_floor_tiles(map: &Map) -> Vec<(IVec3, Option<Tile>)> {
-    let mut tiles = Vec::with_capacity(map.tiles.len());
-    for y in 0..map.tiles.nrows() {
-        for x in 0..map.tiles.ncols() {
-            let (sprite_index, colour) =
-                map.floor_tile_sprite_index(IVec2::new(x as i32, y as i32));
+    let mut tiles = Vec::with_capacity(map.wall_tiles.len());
+    for y in 0..map.wall_tiles.nrows() {
+        for x in 0..map.wall_tiles.ncols() {
+            let (sprite_index, colour) = map.floor_tile_sprite_index(ivec2(x as i32, y as i32));
             tiles.push((
                 ivec3(x as i32, y as i32, LAYER_FLOOR),
                 Some(Tile {
@@ -87,10 +86,10 @@ fn generate_initial_floor_tiles(map: &Map) -> Vec<(IVec3, Option<Tile>)> {
 }
 
 fn generate_initial_wall_tiles(map: &Map) -> Vec<(IVec3, Option<Tile>)> {
-    let mut tiles = Vec::with_capacity(map.tiles.len());
-    for y in 0..map.tiles.nrows() {
-        for x in 0..map.tiles.ncols() {
-            let (sprite_index, colour) = map.wall_tile_sprite_index(IVec2::new(x as i32, y as i32));
+    let mut tiles = Vec::with_capacity(map.wall_tiles.len());
+    for y in 0..map.wall_tiles.nrows() {
+        for x in 0..map.wall_tiles.ncols() {
+            let (sprite_index, colour) = map.wall_tile_sprite_index(ivec2(x as i32, y as i32));
             tiles.push((
                 ivec3(x as i32, y as i32, LAYER_WALLS),
                 Some(Tile {
@@ -129,7 +128,7 @@ fn spawn_tilemap(
         },
         transform: Transform {
             scale: Vec3::splat(TILEMAP_SCALE),
-            translation: Vec3::new(0.0, 0.0, 0.0),
+            translation: vec3(0.0, 0.0, 0.0),
             ..Default::default()
         },
         ..Default::default()

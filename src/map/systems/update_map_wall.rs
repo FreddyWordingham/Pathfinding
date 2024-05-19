@@ -14,7 +14,7 @@ pub fn update_map_wall(
 
     let mut tiles = Vec::with_capacity(event_reader.len());
     for event in event_reader.read() {
-        map.tiles[position_to_index(event.position)] = event.tile_type.clone();
+        map.wall_tiles[position_to_index(event.position)] = event.wall_tile_type.clone();
         tiles.push((
             event.position.extend(LAYER_WALLS),
             Some(Tile {

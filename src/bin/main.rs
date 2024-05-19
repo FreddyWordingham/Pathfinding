@@ -28,6 +28,6 @@ fn place_random_wall(mut update_map_wall_event: EventWriter<UpdateMapWallEvent>)
     let y = rng.gen_range(0..100);
     update_map_wall_event.send(UpdateMapWallEvent {
         position: IVec2::new(x, y),
-        tile_type: TileType::Wall,
+        wall_tile_type: WallTileType::Wall,
     });
 }
