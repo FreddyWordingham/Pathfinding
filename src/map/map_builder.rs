@@ -9,21 +9,29 @@ use super::{FloorTileType, Map, WallTileType};
 #[derive(Resource)]
 pub struct MapBuilder {
     pub tile_size: Vec2,
+    pub tilemap_scale: f32,
     pub floor_tiles: Array2<FloorTileType>,
     pub wall_tiles: Array2<WallTileType>,
 }
 
 impl MapBuilder {
-    pub fn new(tile_size: Vec2, map_size: IVec2) -> Self {
+    pub fn new(tile_size: Vec2, tilemap_scale: f32, map_size: IVec2) -> Self {
+        debug_assert!(tile_size.x > 0.0);
+        debug_assert!(tile_size.y > 0.0);
+        debug_assert!(tilemap_scale > 0.0);
+        debug_assert!(map_size.x > 0);
+        debug_assert!(map_size.y > 0);
+
         Self {
             tile_size: tile_size,
+            tilemap_scale: tilemap_scale,
             floor_tiles: Array2::default((map_size.y as usize, map_size.x as usize)),
             wall_tiles: Array2::default((map_size.y as usize, map_size.x as usize)),
         }
     }
 
-    pub fn new_empty_box(tile_size: Vec2, map_size: IVec2) -> Self {
-        let mut map_builder = Self::new(tile_size, map_size);
+    pub fn new_empty_box(tile_size: Vec2, tilemap_scale: f32, map_size: IVec2) -> Self {
+        let mut map_builder = Self::new(tile_size, tilemap_scale, map_size);
 
         // Add vertical walls
         for y in 0..map_size.y {
@@ -40,8 +48,8 @@ impl MapBuilder {
         map_builder
     }
 
-    pub fn new_random(tile_size: Vec2, map_size: IVec2) -> Self {
-        let mut map_builder = Self::new(tile_size, map_size);
+    pub fn new_random(tile_size: Vec2, tilemap_scale: f32, map_size: IVec2) -> Self {
+        let mut map_builder = Self::new(tile_size, tilemap_scale, map_size);
 
         let mut rng = rand::thread_rng();
 
@@ -72,6 +80,7 @@ impl MapBuilder {
     pub fn build(self) -> Map {
         Map {
             tile_size: self.tile_size,
+            tilemap_scale: self.tilemap_scale,
             floor_tiles: self.floor_tiles,
             wall_tiles: self.wall_tiles,
         }

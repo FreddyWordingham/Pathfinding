@@ -11,3 +11,7 @@ pub const CAMERA_ZOOM_OUT: KeyCode = KeyCode::KeyQ;
 
 pub const CAMERA_MOVE_SPEED: f32 = 500.0;
 pub const CAMERA_ZOOM_SPEED: f32 = 1.0;
+
+// Map controls
+pub const PLACE_WALL: MouseButton = MouseButton::Left;
+pub const REMOVE_WALL: MouseButton = MouseButton::Right;

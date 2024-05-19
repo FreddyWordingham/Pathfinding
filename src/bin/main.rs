@@ -11,21 +11,25 @@ fn main() {
         .add_plugins(InputPlugin)
         .add_systems(Startup, spawn_camera)
         .add_systems(Update, bevy::window::close_on_esc)
-        .add_systems(Update, place_random_wall)
+        // .add_systems(Update, place_random_wall)
         .run();
 }
 
-fn spawn_camera(mut commands: Commands, _map: Res<Map>) {
+fn spawn_camera(mut commands: Commands, map: Res<Map>) {
+    let centre = map.centre();
     commands.spawn(Camera2dBundle {
-        transform: Transform::from_translation(Vec3::new(0.0, 0.0, 1.0)),
+        transform: Transform::from_translation(centre.extend(100.0)),
         ..Default::default()
     });
 }
 
-fn place_random_wall(mut update_map_wall_event: EventWriter<UpdateMapWallEvent>) {
+fn place_random_wall(mut update_map_wall_event: EventWriter<UpdateMapWallEvent>, map: Res<Map>) {
+    let ncols = map.wall_tiles.ncols();
+    let nrows = map.wall_tiles.nrows();
+
     let rng = &mut rand::thread_rng();
-    let x = rng.gen_range(0..100);
-    let y = rng.gen_range(0..100);
+    let x = rng.gen_range(0..ncols as i32);
+    let y = rng.gen_range(0..nrows as i32);
     update_map_wall_event.send(UpdateMapWallEvent {
         position: IVec2::new(x, y),
         wall_tile_type: WallTileType::Wall,

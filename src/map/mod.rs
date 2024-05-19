@@ -15,8 +15,8 @@ mod tile_types;
 use constants::*;
 pub use events::UpdateMapWallEvent;
 use map_builder::MapBuilder;
-pub use resources::Map;
-use systems::update_map_wall;
+pub use resources::{CursorTileCoords, Map};
+use systems::*;
 pub use tile_types::{FloorTileType, WallTileType};
 
 pub struct MapPlugin;
@@ -26,8 +26,9 @@ impl Plugin for MapPlugin {
         app.add_plugins(SimpleTileMapPlugin)
             .add_event::<UpdateMapWallEvent>()
             .init_resource::<Map>()
+            .init_resource::<CursorTileCoords>()
             .add_systems(Startup, setup)
-            .add_systems(Update, update_map_wall);
+            .add_systems(Update, (update_cursor_tile_coords, update_map_wall));
     }
 }
 
@@ -38,7 +39,8 @@ fn setup(
     mut map: ResMut<Map>,
 ) {
     // Initialise the map
-    let map_builder = MapBuilder::new_empty_box(vec2(TILE_WIDTH, TILE_HEIGHT), ivec2(100, 100));
+    let map_builder =
+        MapBuilder::new_empty_box(vec2(TILE_WIDTH, TILE_HEIGHT), TILEMAP_SCALE, ivec2(10, 10));
     *map = map_builder.build();
 
     // Load the texture atlas

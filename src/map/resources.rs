@@ -6,10 +6,15 @@ use super::{
     tile_types::{FloorTileType, WallTileType},
 };
 
+/// Cursor location on the tilemap
+#[derive(Resource, Default)]
+pub struct CursorTileCoords(pub IVec2);
+
 /// The map of the game
 #[derive(Resource)]
 pub struct Map {
     pub tile_size: Vec2,
+    pub tilemap_scale: f32,
     pub floor_tiles: Array2<FloorTileType>,
     pub wall_tiles: Array2<WallTileType>,
 }
@@ -18,6 +23,7 @@ impl Default for Map {
     fn default() -> Self {
         Map {
             tile_size: Vec2::new(32.0, 32.0),
+            tilemap_scale: 1.0,
             floor_tiles: Array2::default((1, 1)),
             wall_tiles: Array2::default((1, 1)),
         }
@@ -25,6 +31,21 @@ impl Default for Map {
 }
 
 impl Map {
+    pub fn width(&self) -> usize {
+        self.wall_tiles.ncols()
+    }
+
+    pub fn height(&self) -> usize {
+        self.wall_tiles.nrows()
+    }
+
+    pub fn centre(&self) -> Vec2 {
+        Vec2::new(
+            self.tile_size.x * self.wall_tiles.ncols() as f32 * 0.5,
+            self.tile_size.y * self.wall_tiles.nrows() as f32 * 0.5,
+        )
+    }
+
     pub fn in_bounds(&self, position: IVec2) -> bool {
         position.x >= 0
             && position.x < self.wall_tiles.ncols() as i32
