@@ -8,7 +8,7 @@ use super::{
 
 /// Cursor location on the tilemap
 #[derive(Resource, Default)]
-pub struct CursorTileCoords(pub IVec2);
+pub struct CursorTileCoords(pub Option<IVec2>);
 
 /// The map of the game
 #[derive(Resource)]
