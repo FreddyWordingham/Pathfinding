@@ -1,5 +1,9 @@
 use bevy::{math::vec2, prelude::*};
 
+// Layers
+pub const LAYER_FLOOR: i32 = 0;
+pub const LAYER_WALLS: i32 = 1;
+
 // Map
 pub const TILEMAP_IMAGE: &str = "atlas.png";
 pub const TILEMAP_COLUMNS: usize = 10;
@@ -10,7 +14,7 @@ pub const TILE_WIDTH: f32 = 32.0;
 pub const TILE_HEIGHT: f32 = TILE_WIDTH;
 pub const TILEMAP_SCALE: f32 = 1.0;
 
-// Glyph Indices
+// Glyphs
 pub const GLYPH_VOID: u32 = 0;
 pub const GLYPH_WALL_SINGLE: u32 = 10;
 pub const GLYPH_WALL_ENCLOSED: u32 = 20;
@@ -70,6 +74,3 @@ pub const GLYPH_T_INTERSECTION_SOUTH_ANTICLOCKWISE: u32 = 49;
 pub const GLYPH_T_INTERSECTION_WEST_ANTICLOCKWISE: u32 = 59;
 pub const GLYPH_T_INTERSECTION_NORTH_ANTICLOCKWISE: u32 = 69;
 pub const GLYPH_T_INTERSECTION_EAST_ANTICLOCKWISE: u32 = 79;
-
-// Layers
-pub const LAYER_FLOOR: i32 = 0;

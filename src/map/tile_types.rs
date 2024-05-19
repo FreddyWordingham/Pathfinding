@@ -1,5 +1,5 @@
 /// Types of tiles in the map
-#[derive(PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum TileType {
     Void,
     Floor,

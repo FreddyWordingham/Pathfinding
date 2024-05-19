@@ -25,7 +25,60 @@ impl Map {
             && position.y < self.tiles.nrows() as i32
     }
 
-    pub fn tile_sprite_index(&self, position: IVec2) -> (u32, Color) {
+    pub fn is_wall(&self, position: IVec2) -> bool {
+        if !self.in_bounds(position) {
+            return false;
+        }
+        self.tiles[position_to_index(position)] == TileType::Wall
+    }
+
+    pub fn get_neighbours(&self, position: IVec2) -> Vec<IVec2> {
+        let mut neighbours = Vec::new();
+
+        let nn = position + ivec2(0, 1);
+        let ne = position + ivec2(1, 1);
+        let ee = position + ivec2(1, 0);
+        let se = position + ivec2(1, -1);
+        let ss = position + ivec2(0, -1);
+        let sw = position + ivec2(-1, -1);
+        let ww = position + ivec2(-1, 0);
+        let nw = position + ivec2(-1, 1);
+
+        if self.in_bounds(nn) {
+            neighbours.push(nn);
+        }
+        if self.in_bounds(ne) {
+            neighbours.push(ne);
+        }
+        if self.in_bounds(ee) {
+            neighbours.push(ee);
+        }
+        if self.in_bounds(se) {
+            neighbours.push(se);
+        }
+        if self.in_bounds(ss) {
+            neighbours.push(ss);
+        }
+        if self.in_bounds(sw) {
+            neighbours.push(sw);
+        }
+        if self.in_bounds(ww) {
+            neighbours.push(ww);
+        }
+        if self.in_bounds(nw) {
+            neighbours.push(nw);
+        }
+
+        neighbours
+    }
+
+    pub fn floor_tile_sprite_index(&self, position: IVec2) -> (u32, Color) {
+        debug_assert!(self.in_bounds(position));
+
+        (GLYPH_WALL_ENCLOSED, Color::DARK_GRAY)
+    }
+
+    pub fn wall_tile_sprite_index(&self, position: IVec2) -> (u32, Color) {
         debug_assert!(self.in_bounds(position));
 
         match self.tiles[position_to_index(position)] {
@@ -35,16 +88,12 @@ impl Map {
         }
     }
 
-    pub fn is_wall(&self, position: IVec2) -> bool {
-        if !self.in_bounds(position) {
-            return false;
-        }
-        self.tiles[position_to_index(position)] == TileType::Wall
-    }
-
-    fn connected_wall_sprite_index(&self, position: IVec2) -> u32 {
+    pub fn connected_wall_sprite_index(&self, position: IVec2) -> u32 {
         debug_assert!(self.in_bounds(position));
-        debug_assert!(self.tiles[position_to_index(position)] == TileType::Wall);
+
+        if self.tiles[position_to_index(position)] != TileType::Wall {
+            return GLYPH_VOID;
+        }
 
         let nn = self.is_wall(position + ivec2(0, 1));
         let ne = self.is_wall(position + ivec2(1, 1));
@@ -118,16 +167,14 @@ impl Map {
                 GLYPH_T_INTERSECTION_NORTH_ANTICLOCKWISE
             }
             (true, _, false, _, true, true, true, false) => GLYPH_T_INTERSECTION_EAST_ANTICLOCKWISE,
-
-            _ => GLYPH_WALL_ENCLOSED,
         }
     }
 }
 
-fn position_to_index(position: IVec2) -> (usize, usize) {
+pub fn position_to_index(position: IVec2) -> (usize, usize) {
     (position.y as usize, position.x as usize)
 }
 
-fn index_to_position(index: (usize, usize)) -> IVec2 {
+pub fn index_to_position(index: (usize, usize)) -> IVec2 {
     ivec2(index.1 as i32, index.0 as i32)
 }
