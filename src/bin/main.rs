@@ -3,10 +3,11 @@ use bevy_pathfinding::prelude::*;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         // .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin::default())
         // .add_plugins(bevy::diagnostic::LogDiagnosticsPlugin::default())
         .add_plugins(MapPlugin)
+        .add_plugins(InputPlugin)
         .add_systems(Startup, spawn_camera)
         .add_systems(Update, bevy::window::close_on_esc)
         .run();

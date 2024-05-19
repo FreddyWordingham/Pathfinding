@@ -60,6 +60,11 @@ impl Map {
             (true, true, true, true, true, true, true, true) => GLYPH_WALL_ENCLOSED,
             (true, false, true, false, true, false, true, false) => GLYPH_WALL_CROSS,
 
+            (true, true, true, false, true, false, true, false) => GLYPH_WALL_CROSS_NORTH_EAST,
+            (true, false, true, true, true, false, true, false) => GLYPH_WALL_CROSS_SOUTH_EAST,
+            (true, false, true, false, true, true, true, false) => GLYPH_WALL_CROSS_SOUTH_WEST,
+            (true, false, true, false, true, false, true, true) => GLYPH_WALL_CROSS_NORTH_WEST,
+
             (true, _, false, _, false, _, false, _) => GLYPH_WALL_FINGER_SOUTH,
             (false, _, true, _, false, _, false, _) => GLYPH_WALL_FINGER_WEST,
             (false, _, false, _, true, _, false, _) => GLYPH_WALL_FINGER_NORTH,

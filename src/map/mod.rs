@@ -10,12 +10,11 @@ mod map_builder;
 mod resources;
 mod systems;
 mod tile_types;
-mod utils;
 
 use constants::*;
-pub use map_builder::MapBuilder;
+use map_builder::MapBuilder;
 pub use resources::Map;
-pub use tile_types::TileType;
+use tile_types::TileType;
 
 pub struct MapPlugin;
 
