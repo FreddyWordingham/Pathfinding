@@ -21,7 +21,10 @@ impl Plugin for CharactersPlugin {
         app.add_plugins(TweeningPlugin)
             .add_plugins(EntropyPlugin::<WyRand>::with_seed(seed.to_ne_bytes()))
             .add_systems(Startup, spawn_character)
-            .add_systems(Update, (randomly_move, clean_up_completed_tweens));
+            .add_systems(
+                Update,
+                (randomly_move, walk_around, clean_up_completed_tweens),
+            );
     }
 }
 
@@ -35,7 +38,7 @@ fn spawn_character(
     let yi = (map.height() / 2) as i32;
     let centre = map.coords_to_position(ivec2(xi, yi)).unwrap();
 
-    for _ in 0..100 {
+    for _ in 0..1 {
         commands.spawn((
             Name::new("Spider"),
             SpriteBundle {
@@ -43,7 +46,8 @@ fn spawn_character(
                 transform: Transform::from_translation(centre.extend(CHARACTERS_TRANSLATION_Z)),
                 ..default()
             },
-            RandomMovement {},
+            // RandomMovement {},
+            WalkingAround {},
             rng.fork_rng(),
         ));
     }

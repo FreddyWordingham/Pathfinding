@@ -1,5 +1,6 @@
 use bevy::{math::ivec2, prelude::*};
 use ndarray::Array2;
+use pathfinding::prelude::*;
 
 use super::{
     constants::*,
@@ -196,6 +197,85 @@ impl Map {
             (true, _, false, _, true, true, true, false) => GLYPH_T_INTERSECTION_EAST_ANTICLOCKWISE,
         }
     }
+
+    pub fn tiles_in_vicinity(&self, position: IVec2, radius: i32) -> Vec<IVec2> {
+        let mut tiles = Vec::with_capacity((2 * radius + 1).pow(2) as usize);
+        let max_radius = heuristic(ivec2(0, 0), ivec2(radius, 0));
+        for y in -radius..=radius {
+            for x in -radius..=radius {
+                let coords = ivec2(position.x + x, position.y + y);
+                if heuristic(position, coords) > max_radius {
+                    continue;
+                }
+
+                if self.in_bounds(coords)
+                    && self.wall_tiles[position_to_index(coords)] == WallTileType::Empty
+                {
+                    tiles.push(coords);
+                }
+            }
+        }
+        tiles.shrink_to_fit();
+        tiles
+    }
+
+    pub fn tiles_in_view(&self, position: IVec2, radius: i32) -> Vec<IVec2> {
+        self.tiles_in_vicinity(position, radius)
+            .into_iter()
+            .filter(|&target| self.line_of_sight(position, target))
+            .collect()
+    }
+
+    pub fn shortest_path(&self, start: IVec2, target: IVec2) -> Option<(Vec<IVec2>, i32)> {
+        let affordability = self.wall_tiles.map(|tile| match tile {
+            WallTileType::Empty => 1,
+            WallTileType::Wall => 100,
+        });
+        astar(
+            &start,
+            |&pos| neighbours(pos, &affordability),
+            |&pos| heuristic(pos, target),
+            |&pos| pos == target,
+        )
+    }
+
+    pub fn line_of_sight(&self, start: IVec2, target: IVec2) -> bool {
+        let mut line = bresenham_line(start, target).into_iter();
+        while let Some(pos) = line.next() {
+            if self.is_wall(pos) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+// Define the function to convert the grid to a pathfinding-compatible format
+fn neighbours(pos: IVec2, grid: &Array2<i32>) -> Vec<(IVec2, i32)> {
+    let mut result = Vec::new();
+
+    let directions = [
+        (1, 0),  // Right
+        (0, 1),  // Down
+        (-1, 0), // Left
+        (0, -1), // Up
+    ];
+
+    for &(dx, dy) in &directions {
+        let nx = pos.x as isize + dx;
+        let ny = pos.y as isize + dy;
+
+        if nx >= 0 && nx < grid.ncols() as isize && ny >= 0 && ny < grid.nrows() as isize {
+            let cost = grid[position_to_index(pos)];
+            result.push((ivec2(nx as i32, ny as i32), cost));
+        }
+    }
+
+    result
+}
+
+fn heuristic(a: IVec2, b: IVec2) -> i32 {
+    (((((a.x - b.x).pow(2) + (a.y - b.y).pow(2)) as f32).sqrt()) * 10.0) as i32
 }
 
 pub fn position_to_index(position: IVec2) -> (usize, usize) {
@@ -204,4 +284,37 @@ pub fn position_to_index(position: IVec2) -> (usize, usize) {
 
 pub fn index_to_position(index: (usize, usize)) -> IVec2 {
     ivec2(index.1 as i32, index.0 as i32)
+}
+
+fn bresenham_line(origin: IVec2, target: IVec2) -> Vec<IVec2> {
+    let mut points = Vec::new();
+
+    let mut x0 = origin.x;
+    let mut y0 = origin.y;
+    let x1 = target.x;
+    let y1 = target.y;
+
+    let dx = (x1 - x0).abs();
+    let dy = -(y1 - y0).abs();
+    let sx = if x0 < x1 { 1 } else { -1 };
+    let sy = if y0 < y1 { 1 } else { -1 };
+    let mut err = dx + dy;
+
+    loop {
+        points.push(IVec2::new(x0, y0));
+        if x0 == x1 && y0 == y1 {
+            break;
+        }
+        let e2 = 2 * err;
+        if e2 >= dy {
+            err += dy;
+            x0 += sx;
+        }
+        if e2 <= dx {
+            err += dx;
+            y0 += sy;
+        }
+    }
+
+    points
 }
