@@ -219,6 +219,13 @@ impl Map {
         tiles
     }
 
+    pub fn get_affordance(&self, position: IVec2) -> i32 {
+        match self.wall_tiles[position_to_index(position)] {
+            WallTileType::Empty => 1,
+            WallTileType::Wall => 100,
+        }
+    }
+
     pub fn tiles_in_view(&self, position: IVec2, radius: i32) -> Vec<IVec2> {
         self.tiles_in_vicinity(position, radius)
             .into_iter()

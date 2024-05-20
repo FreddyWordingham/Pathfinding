@@ -47,7 +47,10 @@ fn spawn_character(
                 ..default()
             },
             // RandomMovement {},
-            WalkingAround {},
+            WalkingAround {
+                remaining_path: Vec::new(),
+                remaining_cost: 0,
+            },
             rng.fork_rng(),
         ));
     }
