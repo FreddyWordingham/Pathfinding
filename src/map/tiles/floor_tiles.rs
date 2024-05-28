@@ -1,5 +1,5 @@
 /// Tile types in the floor layer.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum FloorTileType {
     Empty,
     Grass,

@@ -11,17 +11,36 @@ pub fn trigger_redraw_map(
     mut event_writer: EventWriter<RedrawMapEvent>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Space) {
-        println!("EVENT: RedrawMap");
         event_writer.send(RedrawMapEvent);
     }
 }
 
-pub fn redraw_map(
-    event_reader: EventReader<RedrawMapEvent>,
+pub fn redraw_wall_tiles(
+    mut event_reader: EventReader<RedrawWallTileEvent>,
     map: Res<Map>,
     mut query: Query<&mut TileMap>,
 ) {
-    if !event_reader.is_empty() {
+    let mut tiles = Vec::with_capacity(event_reader.len());
+    for RedrawWallTileEvent(position) in event_reader.read() {
+        let (sprite_index, colour) = map.wall_tile_glyph(*position);
+        tiles.push((
+            position.extend(LAYER_WALLS),
+            Some(Tile {
+                sprite_index,
+                color: colour,
+                ..Default::default()
+            }),
+        ));
+    }
+    query.single_mut().set_tiles(tiles);
+}
+
+pub fn redraw_map(
+    mut event_reader: EventReader<RedrawMapEvent>,
+    map: Res<Map>,
+    mut query: Query<&mut TileMap>,
+) {
+    for _event in event_reader.read() {
         query.single_mut().set_tiles(all_layer_sprites(&map));
     }
 }

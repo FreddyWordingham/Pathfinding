@@ -36,6 +36,14 @@ impl Default for Map {
 }
 
 impl Map {
+    // Access
+
+    pub fn set_wall_tile(&mut self, position: IVec2, tile_type: WallTileType) {
+        debug_assert!(self.in_bounds(position));
+
+        self.wall_tiles[position_to_index(position)] = tile_type;
+    }
+
     // Geometry
 
     pub fn centre(&self) -> Vec2 {
@@ -52,7 +60,7 @@ impl Map {
             && coords.y < self.wall_tiles.nrows() as i32
     }
 
-    fn adjacent_walls(&self, position: IVec2) -> [bool; 8] {
+    fn are_adjacent_tiles_walls(&self, position: IVec2) -> [bool; 8] {
         let is_wall = |position: IVec2| -> bool {
             if !self.in_bounds(position) {
                 return false;
@@ -70,6 +78,26 @@ impl Map {
             is_wall(position + ivec2(-1, 0)),
             is_wall(position + ivec2(-1, 1)),
         ]
+    }
+
+    pub fn adjacent_coordinates_to_tile(&self, position: IVec2) -> Vec<IVec2> {
+        #[rustfmt::skip]
+        const OFFSETS: [(i32, i32); 8] = [
+            (-1, -1), (-1, 0), (-1, 1),
+            ( 0, -1),          ( 0, 1),
+            ( 1, -1), ( 1, 0), ( 1, 1),
+        ];
+
+        let mut positions = Vec::with_capacity(8);
+
+        for &(dx, dy) in &OFFSETS {
+            let new_position = position + ivec2(dx, dy);
+            if self.in_bounds(new_position) {
+                positions.push(new_position);
+            }
+        }
+
+        positions
     }
 
     // Rendering
@@ -100,7 +128,7 @@ impl Map {
         debug_assert!(self.in_bounds(position));
         debug_assert!(*tile == WallTileType::Wall);
 
-        let adjacent_walls = self.adjacent_walls(position);
+        let adjacent_walls = self.are_adjacent_tiles_walls(position);
         connection_glyph(adjacent_walls)
     }
 }

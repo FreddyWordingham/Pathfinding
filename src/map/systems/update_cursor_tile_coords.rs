@@ -14,7 +14,9 @@ pub fn update_cursor_tile_coords(
     cursor_tile_coords.0 = get_cursor_tile_coords(window, camera, camera_transform, &map);
 }
 
-pub fn get_cursor_tile_coords(
+/// Get the tile coordinates of the cursor in the world.
+/// Returns None if the cursor is outside the map bounds.
+fn get_cursor_tile_coords(
     window: &Window,
     camera: &Camera,
     camera_transform: &GlobalTransform,
