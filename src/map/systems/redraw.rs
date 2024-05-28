@@ -8,16 +8,16 @@ use crate::prelude::*;
 
 pub fn trigger_redraw_map(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut event_writer: EventWriter<RedrawMap>,
+    mut event_writer: EventWriter<RedrawMapEvent>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Space) {
         println!("EVENT: RedrawMap");
-        event_writer.send(RedrawMap);
+        event_writer.send(RedrawMapEvent);
     }
 }
 
 pub fn redraw_map(
-    event_reader: EventReader<RedrawMap>,
+    event_reader: EventReader<RedrawMapEvent>,
     map: Res<Map>,
     mut query: Query<&mut TileMap>,
 ) {
