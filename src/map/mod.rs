@@ -34,7 +34,7 @@ impl Plugin for MapPlugin {
             .add_systems(Update, update_map_wall.after(set_map_wall))
             .add_systems(Update, trigger_redraw_map)
             .add_systems(Update, redraw_map.after(trigger_redraw_map))
-            .add_systems(Update, redraw_wall_tiles.after(update_map_wall));
+            .add_systems(Update, redraw_wall_tiles.after(trigger_redraw_map));
     }
 }
 
