@@ -6,14 +6,23 @@ use crate::prelude::*;
 pub fn set_map_wall(
     buttons: Res<ButtonInput<MouseButton>>,
     cursor_tile_coords: Res<CursorTileCoords>,
+    mut prev_tile_coords: Local<IVec2>,
     mut set_wall_events: EventWriter<SetMapWallEvent>,
 ) {
     if let Some(coords) = cursor_tile_coords.0 {
-        if buttons.just_pressed(PLACE_WALL) {
+        if buttons.pressed(PLACE_WALL) && coords != *prev_tile_coords {
             set_wall_events.send(SetMapWallEvent {
                 position: coords,
                 wall_tile_type: WallTileType::Wall,
             });
+            *prev_tile_coords = coords;
+        }
+        if buttons.pressed(REMOVE_WALL) && coords != *prev_tile_coords {
+            set_wall_events.send(SetMapWallEvent {
+                position: coords,
+                wall_tile_type: WallTileType::Empty,
+            });
+            *prev_tile_coords = coords;
         }
     }
 }
