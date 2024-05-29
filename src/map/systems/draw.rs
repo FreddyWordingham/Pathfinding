@@ -58,8 +58,8 @@ fn all_layer_sprites(map: &Map) -> Vec<(IVec3, Option<Tile>)> {
 
 fn floor_layer_sprites(map: &Map) -> Vec<(IVec3, Option<Tile>)> {
     let mut tiles = Vec::with_capacity(map.wall_tiles.len());
-    for y in 0..map.wall_tiles.nrows() {
-        for x in 0..map.wall_tiles.ncols() {
+    for y in 0..map.floor_tiles.nrows() {
+        for x in 0..map.floor_tiles.ncols() {
             let (sprite_index, colour) = map.floor_tile_glyph(ivec2(x as i32, y as i32));
             tiles.push((
                 ivec3(x as i32, y as i32, LAYER_FLOOR),

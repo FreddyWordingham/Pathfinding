@@ -4,9 +4,3 @@ pub enum WallTileType {
     Empty,
     Wall,
 }
-
-impl Default for WallTileType {
-    fn default() -> Self {
-        WallTileType::Empty
-    }
-}

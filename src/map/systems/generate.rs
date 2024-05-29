@@ -8,7 +8,10 @@ pub fn generate_map(
     mut redraw_map_events: EventWriter<DrawMapEvent>,
 ) {
     for _ in generate_map_events.read() {
-        *map = Map::default();
+        // let map_builder = MapBuilder::new_empty_box(7, 7);
+        let map_builder = MapBuilder::new_empty_island(17, 17);
+
+        *map = map_builder.build();
         redraw_map_events.send(DrawMapEvent);
     }
 }

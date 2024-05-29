@@ -7,8 +7,11 @@ pub enum FloorTileType {
     Stone,
 }
 
-impl Default for FloorTileType {
-    fn default() -> Self {
-        FloorTileType::Empty
+impl FloorTileType {
+    pub fn supports_wall(&self) -> bool {
+        match self {
+            FloorTileType::Empty => false,
+            _ => true,
+        }
     }
 }

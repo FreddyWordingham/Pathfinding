@@ -12,29 +12,44 @@ pub struct Map {
 
 impl Default for Map {
     fn default() -> Self {
-        let mut wall_tiles = Array2::from_elem((10, 10), WallTileType::Empty);
+        let mut wall_tiles = Array2::from_elem((7, 7), WallTileType::Empty);
 
-        for i in 0..10 {
-            wall_tiles[(0, i)] = WallTileType::Wall;
-            wall_tiles[(9, i)] = WallTileType::Wall;
-            wall_tiles[(i, 0)] = WallTileType::Wall;
-            wall_tiles[(i, 9)] = WallTileType::Wall;
+        for i in 0..7 {
+            wall_tiles[(3, i)] = WallTileType::Wall;
+            wall_tiles[(i, 3)] = WallTileType::Wall;
         }
 
         Self {
-            floor_tiles: Array2::from_elem((10, 10), FloorTileType::Grass),
+            floor_tiles: Array2::from_elem((7, 7), FloorTileType::Grass),
             wall_tiles,
         }
     }
 }
 
 impl Map {
+    pub fn new(floor_tiles: Array2<FloorTileType>, wall_tiles: Array2<WallTileType>) -> Self {
+        debug_assert!(!floor_tiles.is_empty());
+        debug_assert!(!wall_tiles.is_empty());
+        debug_assert!(floor_tiles.shape() == wall_tiles.shape());
+
+        Self {
+            floor_tiles,
+            wall_tiles,
+        }
+    }
+
     // Access
 
     pub fn set_wall_tile(&mut self, position: IVec2, tile_type: WallTileType) {
         debug_assert!(self.in_bounds(position));
 
         self.wall_tiles[position_to_index(position)] = tile_type;
+    }
+
+    // Query
+
+    pub fn supports_wall(&self, position: IVec2) -> bool {
+        self.floor_tiles[position_to_index(position)].supports_wall()
     }
 
     // Geometry

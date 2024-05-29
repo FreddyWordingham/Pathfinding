@@ -14,6 +14,10 @@ pub fn set_map_wall_tile(
         wall_tile_type,
     } in event_reader.read()
     {
+        if !map.supports_wall(*position) {
+            continue;
+        }
+
         map.set_wall_tile(*position, *wall_tile_type);
         event_writer.send(DrawWallTileEvent(*position));
     }
