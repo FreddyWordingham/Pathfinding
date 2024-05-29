@@ -6,8 +6,6 @@ use crate::prelude::*;
 /// The map of the game
 #[derive(Resource)]
 pub struct Map {
-    pub tile_size: Vec2,
-    pub tilemap_scale: f32,
     pub floor_tiles: Array2<FloorTileType>,
     pub wall_tiles: Array2<WallTileType>,
 }
@@ -24,8 +22,6 @@ impl Default for Map {
         }
 
         Self {
-            tile_size: Vec2::new(TILE_WIDTH, TILE_HEIGHT),
-            tilemap_scale: TILEMAP_SCALE,
             floor_tiles: Array2::from_elem((10, 10), FloorTileType::Grass),
             wall_tiles,
         }
@@ -44,8 +40,8 @@ impl Map {
     // Geometry
 
     pub fn centre(&self) -> Vec2 {
-        let width = self.wall_tiles.ncols() as f32 * self.tile_size.x;
-        let height = self.wall_tiles.nrows() as f32 * self.tile_size.y;
+        let width = self.wall_tiles.ncols() as f32 * TILE_WIDTH;
+        let height = self.wall_tiles.nrows() as f32 * TILE_HEIGHT;
 
         Vec2::new(width, height) * 0.5
     }

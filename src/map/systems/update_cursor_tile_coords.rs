@@ -27,11 +27,11 @@ fn get_cursor_tile_coords(
         .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
         .map(|ray| ray.origin.truncate())
     {
-        let tile_fx = (world_position.x / (map.tile_size.x * map.tilemap_scale)) + 0.5;
-        let tile_fy = (world_position.y / (map.tile_size.y * map.tilemap_scale)) + 0.5;
+        let tile_fx = world_position.x / (TILE_WIDTH * TILEMAP_SCALE);
+        let tile_fy = world_position.y / (TILE_HEIGHT * TILEMAP_SCALE);
 
-        let tile_ix = tile_fx.floor() as i32;
-        let tile_iy = tile_fy.floor() as i32;
+        let tile_ix = tile_fx.round() as i32;
+        let tile_iy = tile_fy.round() as i32;
 
         let coords = IVec2::new(tile_ix, tile_iy);
 
