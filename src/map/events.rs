@@ -3,6 +3,9 @@ use bevy::prelude::*;
 use crate::prelude::*;
 
 #[derive(Event)]
+pub struct GenerateMapEvent;
+
+#[derive(Event)]
 pub struct RedrawMapEvent;
 
 #[derive(Event)]

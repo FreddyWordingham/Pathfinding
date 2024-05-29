@@ -25,11 +25,13 @@ impl Plugin for MapPlugin {
         app.add_plugins(SimpleTileMapPlugin)
             .init_resource::<Map>()
             .init_resource::<CursorTileCoords>()
+            .add_event::<GenerateMapEvent>()
             .add_event::<RedrawMapEvent>()
             .add_event::<RedrawWallTileEvent>()
             .add_event::<SetMapWallEvent>()
             .add_systems(Startup, setup)
-            .add_systems(Update, update_cursor_tile_coords)
+            .add_systems(Update, generate_map)
+            .add_systems(Update, update_cursor_tile_coords.after(generate_map))
             .add_systems(Update, set_map_wall.after(update_cursor_tile_coords))
             .add_systems(Update, update_map_wall.after(set_map_wall))
             .add_systems(Update, trigger_redraw_map)
@@ -42,7 +44,7 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
-    mut redraw_map_events: EventWriter<RedrawMapEvent>,
+    mut redraw_map_events: EventWriter<GenerateMapEvent>,
 ) {
     // Load the texture atlas
     let texture = asset_server.load::<Image>(ATLAS_IMAGE);
@@ -72,6 +74,6 @@ fn setup(
     };
     commands.spawn((Name::new("Tilemap"), tilemap_bundle));
 
-    // Trigger the redraw map event
-    redraw_map_events.send(RedrawMapEvent);
+    // Trigger the generate map event
+    redraw_map_events.send(GenerateMapEvent);
 }

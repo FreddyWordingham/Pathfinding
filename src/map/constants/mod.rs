@@ -1,7 +1,7 @@
 mod controls;
 mod glyphs;
-mod map;
+mod tilemap;
 
 pub use controls::*;
 pub use glyphs::*;
-pub use map::*;
+pub use tilemap::*;
