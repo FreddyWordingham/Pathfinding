@@ -19,3 +19,4 @@ pub const TILEMAP_CAMERA_Z: f32 = -1.0;
 pub const LAYER_FLOOR: i32 = 0;
 pub const LAYER_WALLS: i32 = 1;
 pub const LAYER_MARKERS: i32 = 2;
+pub const NUM_LAYERS: usize = 3;

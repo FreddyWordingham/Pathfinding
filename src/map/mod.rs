@@ -44,7 +44,8 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
-    mut generate_map_events: EventWriter<GenerateMapEvent>,
+    // mut generate_map_events: EventWriter<GenerateMapEvent>,
+    mut draw_map_events: EventWriter<DrawMapEvent>,
 ) {
     // Load the texture atlas
     let texture = asset_server.load::<Image>(ATLAS_IMAGE);
@@ -74,6 +75,8 @@ fn setup(
     };
     commands.spawn((Name::new("Tilemap"), tilemap_bundle));
 
-    // Trigger the generate map event
-    generate_map_events.send(GenerateMapEvent);
+    // // Trigger the generate map event
+    // generate_map_events.send(GenerateMapEvent);
+    // Draw the map
+    draw_map_events.send(DrawMapEvent);
 }

@@ -96,9 +96,18 @@ impl Map {
 
     // Geometry
 
+    pub fn position_from_tile_coords(&self, coords: IVec2) -> Vec2 {
+        debug_assert!(self.in_bounds(coords));
+
+        let x = coords.x as f32 * TILE_WIDTH * TILEMAP_SCALE;
+        let y = coords.y as f32 * TILE_HEIGHT * TILEMAP_SCALE;
+
+        Vec2::new(x, y)
+    }
+
     pub fn centre(&self) -> Vec2 {
-        let width = self.wall_tiles.ncols() as f32 * TILE_WIDTH;
-        let height = self.wall_tiles.nrows() as f32 * TILE_HEIGHT;
+        let width = self.wall_tiles.ncols() as f32 * TILE_WIDTH * TILEMAP_SCALE;
+        let height = self.wall_tiles.nrows() as f32 * TILE_HEIGHT * TILEMAP_SCALE;
 
         Vec2::new(width, height) * 0.5
     }
