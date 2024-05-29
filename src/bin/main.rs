@@ -15,7 +15,7 @@ fn main() {
 }
 
 // Setup the initial scene.
-fn setup(mut commands: Commands, map: Res<Map>) {
+fn setup(mut commands: Commands, map: Res<Map>, mut events: EventWriter<CentreCamera>) {
     let map_centre = map.centre();
 
     // Camera
@@ -26,4 +26,7 @@ fn setup(mut commands: Commands, map: Res<Map>) {
             ..Default::default()
         },
     ));
+
+    // Centre the camera on the map
+    events.send(CentreCamera);
 }

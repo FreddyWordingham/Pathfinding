@@ -28,11 +28,13 @@ impl Plugin for MapPlugin {
             .init_resource::<Map>()
             .init_resource::<CursorTileCoords>()
             .add_event::<GenerateMapEvent>()
+            .add_event::<CentreCamera>()
             .add_event::<DrawMapEvent>()
             .add_event::<DrawWallTileEvent>()
             .add_event::<SetMapWallEvent>()
             .add_systems(Startup, setup)
             .add_systems(Update, generate_map)
+            .add_systems(Update, centre_camera.after(generate_map))
             .add_systems(Update, update_cursor_tile_coords.after(generate_map))
             .add_systems(Update, set_map_wall_tile)
             .add_systems(Update, draw_map)
@@ -44,8 +46,8 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
-    // mut generate_map_events: EventWriter<GenerateMapEvent>,
-    mut draw_map_events: EventWriter<DrawMapEvent>,
+    mut generate_map_events: EventWriter<GenerateMapEvent>,
+    // mut draw_map_events: EventWriter<DrawMapEvent>,
 ) {
     // Load the texture atlas
     let texture = asset_server.load::<Image>(ATLAS_IMAGE);
@@ -75,8 +77,8 @@ fn setup(
     };
     commands.spawn((Name::new("Tilemap"), tilemap_bundle));
 
-    // // Trigger the generate map event
-    // generate_map_events.send(GenerateMapEvent);
-    // Draw the map
-    draw_map_events.send(DrawMapEvent);
+    // Trigger the generate map event
+    generate_map_events.send(GenerateMapEvent);
+    // // Draw the map
+    // draw_map_events.send(DrawMapEvent);
 }

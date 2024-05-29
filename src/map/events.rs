@@ -6,6 +6,9 @@ use crate::prelude::*;
 pub struct GenerateMapEvent;
 
 #[derive(Event)]
+pub struct CentreCamera;
+
+#[derive(Event)]
 pub struct DrawMapEvent;
 
 #[derive(Event)]
