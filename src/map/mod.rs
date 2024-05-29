@@ -32,7 +32,7 @@ impl Plugin for MapPlugin {
             .add_systems(Startup, setup)
             .add_systems(Update, generate_map)
             .add_systems(Update, update_cursor_tile_coords.after(generate_map))
-            .add_systems(Update, update_map_wall)
+            .add_systems(Update, set_map_wall_tile)
             .add_systems(Update, draw_map)
             .add_systems(Update, draw_wall_tiles);
     }

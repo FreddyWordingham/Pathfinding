@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::prelude::*;
 
 /// System to update the rendered tilemap when a wall on the map is changed.
-pub fn update_map_wall(
+pub fn set_map_wall_tile(
     mut event_reader: EventReader<SetMapWallEvent>,
     mut map: ResMut<Map>,
     mut event_writer: EventWriter<DrawWallTileEvent>,
