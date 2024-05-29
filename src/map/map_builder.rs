@@ -1,9 +1,12 @@
-pub use crate::prelude::*;
+use bevy::{math::ivec2, prelude::*};
 use ndarray::Array2;
+
+pub use crate::prelude::*;
 
 pub struct MapBuilder {
     floor_tiles: Array2<FloorTileType>,
     wall_tiles: Array2<WallTileType>,
+    spawn_points: Vec<IVec2>,
 }
 
 impl MapBuilder {
@@ -20,9 +23,12 @@ impl MapBuilder {
             wall_tiles[(i, width - 1)] = WallTileType::Wall;
         }
 
+        let centre = ivec2(width as i32 / 2, height as i32 / 2);
+
         Self {
             floor_tiles,
             wall_tiles,
+            spawn_points: vec![centre],
         }
     }
 
@@ -39,13 +45,16 @@ impl MapBuilder {
             }
         }
 
+        let centre = ivec2(width as i32 / 2, height as i32 / 2);
+
         Self {
             floor_tiles,
             wall_tiles,
+            spawn_points: vec![centre],
         }
     }
 
     pub fn build(self) -> Map {
-        Map::new(self.floor_tiles, self.wall_tiles)
+        Map::new(self.floor_tiles, self.wall_tiles, self.spawn_points)
     }
 }

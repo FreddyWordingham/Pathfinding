@@ -8,10 +8,12 @@ use crate::prelude::*;
 pub struct Map {
     pub floor_tiles: Array2<FloorTileType>,
     pub wall_tiles: Array2<WallTileType>,
+    pub spawn_points: Vec<IVec2>,
 }
 
 impl Default for Map {
     fn default() -> Self {
+        let floor_tiles = Array2::from_elem((7, 7), FloorTileType::Grass);
         let mut wall_tiles = Array2::from_elem((7, 7), WallTileType::Empty);
 
         for i in 0..7 {
@@ -20,21 +22,28 @@ impl Default for Map {
         }
 
         Self {
-            floor_tiles: Array2::from_elem((7, 7), FloorTileType::Grass),
+            floor_tiles,
             wall_tiles,
+            spawn_points: vec![ivec2(1, 1)],
         }
     }
 }
 
 impl Map {
-    pub fn new(floor_tiles: Array2<FloorTileType>, wall_tiles: Array2<WallTileType>) -> Self {
+    pub fn new(
+        floor_tiles: Array2<FloorTileType>,
+        wall_tiles: Array2<WallTileType>,
+        spawn_points: Vec<IVec2>,
+    ) -> Self {
         debug_assert!(!floor_tiles.is_empty());
         debug_assert!(!wall_tiles.is_empty());
         debug_assert!(floor_tiles.shape() == wall_tiles.shape());
+        debug_assert!(!spawn_points.is_empty());
 
         Self {
             floor_tiles,
             wall_tiles,
+            spawn_points,
         }
     }
 
@@ -50,6 +59,15 @@ impl Map {
 
     pub fn supports_wall(&self, position: IVec2) -> bool {
         self.floor_tiles[position_to_index(position)].supports_wall()
+            && self
+                .spawn_points
+                .iter()
+                .all(|&spawn_point| spawn_point != position)
+    }
+
+    pub fn is_walkable(&self, position: IVec2) -> bool {
+        self.floor_tiles[position_to_index(position)].is_walkable()
+            && self.wall_tiles[position_to_index(position)].is_walkable()
     }
 
     // Geometry

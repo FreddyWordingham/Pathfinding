@@ -8,6 +8,7 @@ fn main() {
         .add_plugins(WorldInspectorPlugin::new())
         .add_plugins(MapPlugin)
         .add_plugins(InputPlugin)
+        .add_plugins(PathfindingPlugin)
         .add_systems(Startup, setup)
         .add_systems(Update, bevy::window::close_on_esc)
         .run();
