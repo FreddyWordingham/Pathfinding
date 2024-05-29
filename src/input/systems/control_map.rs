@@ -7,7 +7,7 @@ pub fn trigger_generate_map_event(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut generate_map_events: EventWriter<GenerateMapEvent>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::KeyR) {
+    if keyboard_input.just_pressed(GENERATE_MAP) {
         generate_map_events.send(GenerateMapEvent);
     }
 }
@@ -17,7 +17,7 @@ pub fn trigger_redraw_map(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut event_writer: EventWriter<DrawMapEvent>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::Space) {
+    if keyboard_input.just_pressed(REDRAW_MAP) {
         event_writer.send(DrawMapEvent);
     }
 }

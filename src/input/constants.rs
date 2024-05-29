@@ -4,6 +4,9 @@ use bevy::prelude::*;
 pub const PLACE_WALL: MouseButton = MouseButton::Left;
 pub const REMOVE_WALL: MouseButton = MouseButton::Right;
 
+pub const GENERATE_MAP: KeyCode = KeyCode::KeyR;
+pub const REDRAW_MAP: KeyCode = KeyCode::Space;
+
 // Camera controls
 pub const CAMERA_PAN_RIGHT: KeyCode = KeyCode::KeyD;
 pub const CAMERA_PAN_LEFT: KeyCode = KeyCode::KeyA;
