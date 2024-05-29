@@ -32,11 +32,9 @@ impl Plugin for MapPlugin {
             .add_systems(Startup, setup)
             .add_systems(Update, generate_map)
             .add_systems(Update, update_cursor_tile_coords.after(generate_map))
-            .add_systems(Update, set_map_wall.after(update_cursor_tile_coords))
-            .add_systems(Update, update_map_wall.after(set_map_wall))
-            .add_systems(Update, trigger_redraw_map)
-            .add_systems(Update, redraw_map.after(trigger_redraw_map))
-            .add_systems(Update, redraw_wall_tiles.after(trigger_redraw_map));
+            .add_systems(Update, update_map_wall)
+            .add_systems(Update, redraw_map)
+            .add_systems(Update, redraw_wall_tiles);
     }
 }
 
@@ -44,7 +42,7 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
-    mut redraw_map_events: EventWriter<GenerateMapEvent>,
+    mut generate_map_events: EventWriter<GenerateMapEvent>,
 ) {
     // Load the texture atlas
     let texture = asset_server.load::<Image>(ATLAS_IMAGE);
@@ -75,5 +73,5 @@ fn setup(
     commands.spawn((Name::new("Tilemap"), tilemap_bundle));
 
     // Trigger the generate map event
-    redraw_map_events.send(GenerateMapEvent);
+    generate_map_events.send(GenerateMapEvent);
 }

@@ -6,15 +6,6 @@ use bevy_simple_tilemap::prelude::*;
 
 use crate::prelude::*;
 
-pub fn trigger_redraw_map(
-    keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut event_writer: EventWriter<RedrawMapEvent>,
-) {
-    if keyboard_input.just_pressed(KeyCode::Space) {
-        event_writer.send(RedrawMapEvent);
-    }
-}
-
 pub fn redraw_wall_tiles(
     mut event_reader: EventReader<RedrawWallTileEvent>,
     map: Res<Map>,
