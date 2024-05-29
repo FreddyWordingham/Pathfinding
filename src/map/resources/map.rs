@@ -35,16 +35,40 @@ impl Map {
         wall_tiles: Array2<WallTileType>,
         spawn_points: Vec<IVec2>,
     ) -> Self {
-        debug_assert!(!floor_tiles.is_empty());
-        debug_assert!(!wall_tiles.is_empty());
-        debug_assert!(floor_tiles.shape() == wall_tiles.shape());
-        debug_assert!(!spawn_points.is_empty());
-
-        Self {
+        let map = Self {
             floor_tiles,
             wall_tiles,
             spawn_points,
+        };
+
+        debug_assert!(map.is_valid());
+
+        map
+    }
+
+    fn is_valid(&self) -> bool {
+        // Check non-empty
+        if self.floor_tiles.is_empty() || self.wall_tiles.is_empty() || self.spawn_points.is_empty()
+        {
+            return false;
         }
+
+        // Check floor and wall tiles have the same dimensions
+        if self.floor_tiles.shape() != self.wall_tiles.shape() {
+            return false;
+        }
+
+        // Check spawn points are in bounds and walkable
+        for &spawn_point in &self.spawn_points {
+            if !self.in_bounds(spawn_point) {
+                return false;
+            }
+            if !self.is_walkable(spawn_point) {
+                return false;
+            }
+        }
+
+        true
     }
 
     // Access
