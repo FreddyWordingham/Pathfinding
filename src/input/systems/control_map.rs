@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use super::super::constants::*;
 use crate::prelude::*;
 
 /// System to trigger a GenerateMapEvent when a key is pressed.
