@@ -1,6 +1,7 @@
 use bevy::{math::ivec2, prelude::*};
 use ndarray::Array2;
 
+use super::super::{constants::*, utils::*};
 use crate::prelude::*;
 
 /// The map of the game

@@ -2,6 +2,15 @@ use bevy::prelude::*;
 
 use crate::prelude::*;
 
+pub fn centre_camera(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut recentre_camera_events: EventWriter<CentreCamera>,
+) {
+    if keyboard_input.pressed(CAMERA_RECENTRE) {
+        recentre_camera_events.send(CentreCamera);
+    }
+}
+
 pub fn camera_movement(
     mut camera_transform_query: Query<&mut Transform, With<Camera2d>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,

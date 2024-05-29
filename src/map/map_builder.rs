@@ -10,6 +10,7 @@ pub struct MapBuilder {
 }
 
 impl MapBuilder {
+    #[allow(dead_code)]
     pub fn new_empty_box(width: usize, height: usize) -> Self {
         let floor_tiles = Array2::from_elem((height, width), FloorTileType::Grass);
         let mut wall_tiles = Array2::from_elem((height, width), WallTileType::Empty);

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_simple_tilemap::prelude::*;
 
-use crate::prelude::*;
+use super::super::map_builder::*;
 
 pub fn generate_map(
     mut generate_map_events: EventReader<GenerateMapEvent>,

@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use super::constants::*;
 
 pub fn connection_glyph(adjacent_walls: [bool; 8]) -> u32 {
     let nn = adjacent_walls[0];
