@@ -1,3 +1,5 @@
+pub const GLYPH_SPAWN_POINT: u32 = 1;
+
 pub const GLYPH_EMPTY: u32 = 0;
 
 pub const GLYPH_WALL_SINGLE: u32 = 10;

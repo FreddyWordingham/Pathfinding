@@ -53,6 +53,7 @@ fn all_layer_sprites(map: &Map) -> Vec<(IVec3, Option<Tile>)> {
     let mut tiles = Vec::with_capacity(map.floor_tiles.len() + map.wall_tiles.len());
     tiles.extend(floor_layer_sprites(&map));
     tiles.extend(wall_layer_sprites(&map));
+    tiles.extend(marker_layer_sprites(&map));
     tiles
 }
 
@@ -88,6 +89,24 @@ fn wall_layer_sprites(map: &Map) -> Vec<(IVec3, Option<Tile>)> {
                 }),
             ));
         }
+    }
+    tiles
+}
+
+fn marker_layer_sprites(map: &Map) -> Vec<(IVec3, Option<Tile>)> {
+    let mut tiles = Vec::with_capacity(map.spawn_points.len());
+    for spawn_point in map.spawn_points.iter() {
+        let sprite_index = 90;
+        let colour = Color::GOLD;
+
+        tiles.push((
+            spawn_point.extend(LAYER_MARKERS),
+            Some(Tile {
+                sprite_index,
+                color: colour,
+                ..Default::default()
+            }),
+        ));
     }
     tiles
 }
