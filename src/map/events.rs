@@ -6,10 +6,10 @@ use crate::prelude::*;
 pub struct GenerateMapEvent;
 
 #[derive(Event)]
-pub struct RedrawMapEvent;
+pub struct DrawMapEvent;
 
 #[derive(Event)]
-pub struct RedrawWallTileEvent(pub IVec2);
+pub struct DrawWallTileEvent(pub IVec2);
 
 #[derive(Event)]
 pub struct SetMapWallEvent {

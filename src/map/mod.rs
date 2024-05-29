@@ -26,15 +26,15 @@ impl Plugin for MapPlugin {
             .init_resource::<Map>()
             .init_resource::<CursorTileCoords>()
             .add_event::<GenerateMapEvent>()
-            .add_event::<RedrawMapEvent>()
-            .add_event::<RedrawWallTileEvent>()
+            .add_event::<DrawMapEvent>()
+            .add_event::<DrawWallTileEvent>()
             .add_event::<SetMapWallEvent>()
             .add_systems(Startup, setup)
             .add_systems(Update, generate_map)
             .add_systems(Update, update_cursor_tile_coords.after(generate_map))
             .add_systems(Update, update_map_wall)
-            .add_systems(Update, redraw_map)
-            .add_systems(Update, redraw_wall_tiles);
+            .add_systems(Update, draw_map)
+            .add_systems(Update, draw_wall_tiles);
     }
 }
 

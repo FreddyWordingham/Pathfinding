@@ -3,31 +3,44 @@ use bevy::{
     prelude::*,
 };
 use bevy_simple_tilemap::prelude::*;
+use std::collections::HashSet;
 
 use crate::prelude::*;
 
-pub fn redraw_wall_tiles(
-    mut event_reader: EventReader<RedrawWallTileEvent>,
+pub fn draw_wall_tiles(
+    mut event_reader: EventReader<DrawWallTileEvent>,
     map: Res<Map>,
     mut query: Query<&mut TileMap>,
 ) {
-    let mut tiles = Vec::with_capacity(event_reader.len());
-    for RedrawWallTileEvent(position) in event_reader.read() {
-        let (sprite_index, colour) = map.wall_tile_glyph(*position);
-        tiles.push((
-            position.extend(LAYER_WALLS),
-            Some(Tile {
-                sprite_index,
-                color: colour,
-                ..Default::default()
-            }),
-        ));
+    // Create a set of all wall tiles that need to be redrawn
+    let mut tiles_to_redraw = HashSet::new();
+    for DrawWallTileEvent(position) in event_reader.read() {
+        tiles_to_redraw.insert(*position);
+        for coord in map.adjacent_coordinates_to_tile(*position) {
+            tiles_to_redraw.insert(coord);
+        }
     }
+
+    // Redraw all wall tiles that need to be redrawn
+    let tiles = tiles_to_redraw
+        .iter()
+        .map(|&position| {
+            let (sprite_index, colour) = map.wall_tile_glyph(position);
+            (
+                position.extend(LAYER_WALLS),
+                Some(Tile {
+                    sprite_index,
+                    color: colour,
+                    ..Default::default()
+                }),
+            )
+        })
+        .collect::<Vec<_>>();
     query.single_mut().set_tiles(tiles);
 }
 
-pub fn redraw_map(
-    mut event_reader: EventReader<RedrawMapEvent>,
+pub fn draw_map(
+    mut event_reader: EventReader<DrawMapEvent>,
     map: Res<Map>,
     mut query: Query<&mut TileMap>,
 ) {

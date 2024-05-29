@@ -15,10 +15,10 @@ pub fn trigger_generate_map_event(
 /// System tp trigger a RedrawMapEvent when a key is pressed.
 pub fn trigger_redraw_map(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut event_writer: EventWriter<RedrawMapEvent>,
+    mut event_writer: EventWriter<DrawMapEvent>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Space) {
-        event_writer.send(RedrawMapEvent);
+        event_writer.send(DrawMapEvent);
     }
 }
 
