@@ -21,9 +21,6 @@ impl Default for Map {
             wall_tiles[(9, i)] = WallTileType::Wall;
             wall_tiles[(i, 0)] = WallTileType::Wall;
             wall_tiles[(i, 9)] = WallTileType::Wall;
-
-            wall_tiles[(5, i)] = WallTileType::Wall;
-            wall_tiles[(i, 5)] = WallTileType::Wall;
         }
 
         Self {
