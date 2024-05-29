@@ -1,11 +1,13 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_pathfinding_demo::prelude::*;
+use bevy_tweening::TweeningPlugin;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(WorldInspectorPlugin::new())
+        .add_plugins(TweeningPlugin)
         .add_plugins(MapPlugin)
         .add_plugins(InputPlugin)
         .add_plugins(PathfindingPlugin)
