@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_tweening::Animator;
 
 use super::super::constants::*;
 use crate::prelude::*;
@@ -13,7 +14,10 @@ pub fn centre_camera(
 }
 
 pub fn camera_movement(
-    mut camera_transform_query: Query<&mut Transform, With<Camera2d>>,
+    mut camera_transform_query: Query<
+        &mut Transform,
+        (With<Camera2d>, Without<Animator<Transform>>),
+    >,
     keyboard_input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
 ) {
