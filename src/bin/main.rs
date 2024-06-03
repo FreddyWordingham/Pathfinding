@@ -5,7 +5,10 @@ use bevy_tweening::TweeningPlugin;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins((
+            DefaultPlugins.set(ImagePlugin::default_nearest()),
+            LightingPlugin,
+        ))
         .add_plugins(WorldInspectorPlugin::new())
         .add_plugins(TweeningPlugin)
         .add_plugins(MapPlugin)
@@ -13,6 +16,7 @@ fn main() {
         .add_plugins(PathfindingPlugin)
         .add_systems(Startup, setup)
         .add_systems(Update, bevy::window::close_on_esc)
+        .add_systems(Update, update_settings)
         .run();
 }
 
@@ -26,6 +30,10 @@ fn setup(mut commands: Commands, map: Res<Map>, mut events: EventWriter<CentreCa
         Camera2dBundle {
             transform: Transform::from_translation(map_centre.extend(100.0)),
             ..Default::default()
+        },
+        PostProcessSettings {
+            intensity: 0.02,
+            ..default()
         },
     ));
 
