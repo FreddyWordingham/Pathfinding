@@ -95,13 +95,13 @@ fn wall_layer_sprites(map: &Map) -> Vec<(IVec3, Option<Tile>)> {
 }
 
 fn marker_layer_sprites(map: &Map) -> Vec<(IVec3, Option<Tile>)> {
-    let mut tiles = Vec::with_capacity(map.spawn_points.len());
-    for spawn_point in map.spawn_points.iter() {
+    let mut tiles = Vec::with_capacity(map.spawn_coords.len());
+    for spawn_coords in map.spawn_coords.iter() {
         let sprite_index = GLYPH_SPAWN_POINT;
         let colour = Color::GOLD;
 
         tiles.push((
-            spawn_point.extend(LAYER_MARKERS),
+            spawn_coords.extend(LAYER_MARKERS),
             Some(Tile {
                 sprite_index,
                 color: colour,

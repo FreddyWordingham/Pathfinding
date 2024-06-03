@@ -9,7 +9,7 @@ use crate::prelude::*;
 pub struct Map {
     pub floor_tiles: Array2<FloorTileType>,
     pub wall_tiles: Array2<WallTileType>,
-    pub spawn_points: Vec<IVec2>,
+    pub spawn_coords: Vec<IVec2>,
 }
 
 impl Default for Map {
@@ -25,7 +25,7 @@ impl Default for Map {
         Self {
             floor_tiles,
             wall_tiles,
-            spawn_points: vec![ivec2(1, 1)],
+            spawn_coords: vec![ivec2(1, 1)],
         }
     }
 }
@@ -34,12 +34,12 @@ impl Map {
     pub fn new(
         floor_tiles: Array2<FloorTileType>,
         wall_tiles: Array2<WallTileType>,
-        spawn_points: Vec<IVec2>,
+        spawn_coords: Vec<IVec2>,
     ) -> Self {
         let map = Self {
             floor_tiles,
             wall_tiles,
-            spawn_points,
+            spawn_coords,
         };
 
         debug_assert!(map.is_valid());
@@ -49,7 +49,7 @@ impl Map {
 
     fn is_valid(&self) -> bool {
         // Check non-empty
-        if self.floor_tiles.is_empty() || self.wall_tiles.is_empty() || self.spawn_points.is_empty()
+        if self.floor_tiles.is_empty() || self.wall_tiles.is_empty() || self.spawn_coords.is_empty()
         {
             return false;
         }
@@ -60,7 +60,7 @@ impl Map {
         }
 
         // Check spawn points are in bounds and walkable
-        for &spawn_point in &self.spawn_points {
+        for &spawn_point in &self.spawn_coords {
             if !self.in_bounds(spawn_point) {
                 return false;
             }
@@ -85,7 +85,7 @@ impl Map {
     pub fn supports_wall(&self, position: IVec2) -> bool {
         self.floor_tiles[position_to_index(position)].supports_wall()
             && self
-                .spawn_points
+                .spawn_coords
                 .iter()
                 .all(|&spawn_point| spawn_point != position)
     }
@@ -97,7 +97,7 @@ impl Map {
 
     // Geometry
 
-    pub fn position_from_tile_coords(&self, coords: IVec2) -> Vec2 {
+    pub fn coords_to_position(&self, coords: IVec2) -> Vec2 {
         debug_assert!(self.in_bounds(coords));
 
         let x = coords.x as f32 * TILE_WIDTH * TILEMAP_SCALE;

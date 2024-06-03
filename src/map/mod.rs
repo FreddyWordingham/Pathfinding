@@ -26,6 +26,7 @@ impl Plugin for MapPlugin {
             .init_resource::<Map>()
             .init_resource::<CursorTileCoords>()
             .add_event::<GenerateMapEvent>()
+            .add_event::<SpawnMonsterEvent>()
             .add_event::<CentreCamera>()
             .add_event::<DrawMapEvent>()
             .add_event::<DrawWallTileEvent>()
@@ -37,7 +38,8 @@ impl Plugin for MapPlugin {
             .add_systems(Update, update_cursor_tile_coords.after(generate_map))
             .add_systems(Update, set_map_wall_tile)
             .add_systems(Update, draw_map)
-            .add_systems(Update, draw_wall_tiles);
+            .add_systems(Update, draw_wall_tiles)
+            .add_systems(Update, spawn_monster);
     }
 }
 

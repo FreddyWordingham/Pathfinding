@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+// Spawn controls
+pub const SPAWN_MONSTER: KeyCode = KeyCode::KeyM;
+
 // Map controls
 pub const PLACE_WALL: MouseButton = MouseButton::Left;
 pub const REMOVE_WALL: MouseButton = MouseButton::Right;

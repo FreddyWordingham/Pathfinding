@@ -13,6 +13,7 @@ impl Plugin for InputPlugin {
             .add_systems(Update, centre_camera)
             .add_systems(Update, trigger_generate_map_event)
             .add_systems(Update, trigger_redraw_map)
+            .add_systems(Update, trigger_spawn_monster_event)
             .add_systems(Update, set_map_wall);
     }
 }

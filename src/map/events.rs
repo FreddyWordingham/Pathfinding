@@ -19,3 +19,6 @@ pub struct SetMapWallEvent {
     pub position: IVec2,
     pub wall_tile_type: WallTileType,
 }
+
+#[derive(Event)]
+pub struct SpawnMonsterEvent;
