@@ -17,7 +17,7 @@ pub fn draw_wall_tiles(
     let mut tiles_to_redraw = HashSet::new();
     for DrawWallTileEvent(position) in event_reader.read() {
         tiles_to_redraw.insert(*position);
-        for coord in map.adjacent_coordinates_to_tile(*position) {
+        for coord in map.neighbour_coordinates_to_tile(*position) {
             tiles_to_redraw.insert(coord);
         }
     }

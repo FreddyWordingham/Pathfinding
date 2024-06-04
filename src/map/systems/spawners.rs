@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rand::prelude::*;
 
 use crate::prelude::*;
 
@@ -12,6 +13,7 @@ pub fn spawn_monster(
     asset_server: Res<AssetServer>,
     map: ResMut<Map>,
     mut last_spawn_index: Local<usize>,
+    mut rng: ResMut<GlobalEntropy<WyRand>>,
 ) {
     for _ in event_reader.read() {
         for _ in 0..map.spawn_coords.len() {
@@ -29,6 +31,8 @@ pub fn spawn_monster(
                     transform: Transform::from_translation(spawn_position.extend(MONSTER_Z)),
                     ..Default::default()
                 },
+                RandomMovement,
+                rng.fork_rng(),
             ));
 
             *last_spawn_index += 1;

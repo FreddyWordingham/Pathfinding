@@ -1,7 +1,20 @@
 use bevy::prelude::*;
+use bevy_rand::prelude::*;
+
+mod components;
+mod systems;
+
+pub use components::*;
+use systems::*;
 
 pub struct PathfindingPlugin;
 
 impl Plugin for PathfindingPlugin {
-    fn build(&self, _app: &mut App) {}
+    fn build(&self, app: &mut App) {
+        let seed: u64 = 234;
+
+        app.add_plugins(EntropyPlugin::<WyRand>::with_seed(seed.to_ne_bytes()))
+            .add_systems(Update, randomly_move)
+            .add_systems(Update, clean_up_completed_tweens.after(randomly_move));
+    }
 }

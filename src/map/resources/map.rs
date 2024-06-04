@@ -97,6 +97,13 @@ impl Map {
 
     // Geometry
 
+    pub fn position_to_coords(&self, position: Vec2) -> IVec2 {
+        let x = (position.x / (TILE_WIDTH * TILEMAP_SCALE)) as i32;
+        let y = (position.y / (TILE_HEIGHT * TILEMAP_SCALE)) as i32;
+
+        ivec2(x, y)
+    }
+
     pub fn coords_to_position(&self, coords: IVec2) -> Vec2 {
         debug_assert!(self.in_bounds(coords));
 
@@ -120,7 +127,15 @@ impl Map {
             && coords.y < self.wall_tiles.nrows() as i32
     }
 
-    fn are_adjacent_tiles_walls(&self, position: IVec2) -> [bool; 8] {
+    /// Return a list of walkable tiles adjacent to the given position
+    pub fn adjacent_walkable_tiles(&self, position: IVec2) -> Vec<IVec2> {
+        self.adjacent_coordinates_to_tile(position)
+            .into_iter()
+            .filter(|&coords| self.in_bounds(coords) && self.is_walkable(coords))
+            .collect()
+    }
+
+    fn are_neighbour_tiles_walls(&self, position: IVec2) -> [bool; 8] {
         let is_wall = |position: IVec2| -> bool {
             if !self.in_bounds(position) {
                 return false;
@@ -141,6 +156,26 @@ impl Map {
     }
 
     pub fn adjacent_coordinates_to_tile(&self, position: IVec2) -> Vec<IVec2> {
+        #[rustfmt::skip]
+        const OFFSETS: [(i32, i32); 4] = [
+                      (-1, 0),
+            ( 0, -1),          ( 0, 1),
+                      ( 1, 0),
+        ];
+
+        let mut positions = Vec::with_capacity(8);
+
+        for &(dx, dy) in &OFFSETS {
+            let new_position = position + ivec2(dx, dy);
+            if self.in_bounds(new_position) {
+                positions.push(new_position);
+            }
+        }
+
+        positions
+    }
+
+    pub fn neighbour_coordinates_to_tile(&self, position: IVec2) -> Vec<IVec2> {
         #[rustfmt::skip]
         const OFFSETS: [(i32, i32); 8] = [
             (-1, -1), (-1, 0), (-1, 1),
@@ -188,8 +223,8 @@ impl Map {
         debug_assert!(self.in_bounds(position));
         debug_assert!(*tile == WallTileType::Wall);
 
-        let adjacent_walls = self.are_adjacent_tiles_walls(position);
-        connection_glyph(adjacent_walls)
+        let neighbour_walls = self.are_neighbour_tiles_walls(position);
+        connection_glyph(neighbour_walls)
     }
 }
 
