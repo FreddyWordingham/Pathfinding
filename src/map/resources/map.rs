@@ -105,10 +105,14 @@ impl Map {
         debug_assert!(self.in_bounds(final_coords));
         debug_assert!(start_coords != final_coords);
 
-        // If the start or final tile is blocked, return no path.
-        if !self.is_walkable(start_coords) || !self.is_walkable(final_coords) {
+        // If the final tile is blocked, return no path.
+        if !self.is_walkable(final_coords) {
             return None;
         }
+        // // If the start or final tile is blocked, return no path.
+        // if !self.is_walkable(start_coords) || !self.is_walkable(final_coords) {
+        //     return None;
+        // }
 
         let floor_affordability = self.floor_tiles.map(|tile| match tile {
             FloorTileType::Empty => 1000,

@@ -41,7 +41,8 @@ impl Plugin for MapPlugin {
             .add_systems(Update, set_map_wall_tile)
             .add_systems(Update, draw_map)
             .add_systems(Update, draw_wall_tiles)
-            .add_systems(Update, spawn_monster);
+            .add_systems(Update, spawn_monster)
+            .add_systems(Update, check_for_colliding_walls);
     }
 }
 
