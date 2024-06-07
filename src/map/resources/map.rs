@@ -1,5 +1,6 @@
 use bevy::{math::ivec2, prelude::*};
 use ndarray::Array2;
+use pathfinding::prelude::*;
 
 use super::super::{constants::*, utils::*};
 use crate::prelude::*;
@@ -93,6 +94,38 @@ impl Map {
     pub fn is_walkable(&self, position: IVec2) -> bool {
         self.floor_tiles[position_to_index(position)].is_walkable()
             && self.wall_tiles[position_to_index(position)].is_walkable()
+    }
+
+    pub fn shortest_path(
+        &self,
+        start_coords: IVec2,
+        final_coords: IVec2,
+    ) -> Option<(Vec<IVec2>, i32)> {
+        debug_assert!(self.in_bounds(start_coords));
+        debug_assert!(self.in_bounds(final_coords));
+        debug_assert!(start_coords != final_coords);
+
+        // If the start or final tile is blocked, return no path.
+        if !self.is_walkable(start_coords) || !self.is_walkable(final_coords) {
+            return None;
+        }
+
+        let floor_affordability = self.floor_tiles.map(|tile| match tile {
+            FloorTileType::Empty => 1000,
+            _ => 1,
+        });
+        let wall_affordability = self.wall_tiles.map(|tile| match tile {
+            WallTileType::Empty => 1,
+            WallTileType::Wall => 1000,
+        });
+        let total_affordability = floor_affordability + wall_affordability;
+
+        astar(
+            &start_coords,
+            |&pos| neighbours(pos, &total_affordability),
+            |&pos| heuristic(pos, final_coords),
+            |&pos| pos == final_coords,
+        )
     }
 
     // Geometry
@@ -230,4 +263,32 @@ impl Map {
 
 fn position_to_index(position: IVec2) -> (usize, usize) {
     (position.y as usize, position.x as usize)
+}
+
+// Define the function to convert the grid to a pathfinding-compatible format
+fn neighbours(pos: IVec2, grid: &Array2<i32>) -> Vec<(IVec2, i32)> {
+    let mut result = Vec::new();
+
+    let directions = [
+        (1, 0),  // Right
+        (0, 1),  // Down
+        (-1, 0), // Left
+        (0, -1), // Up
+    ];
+
+    for &(dx, dy) in &directions {
+        let nx = pos.x as isize + dx;
+        let ny = pos.y as isize + dy;
+
+        if nx >= 0 && nx < grid.ncols() as isize && ny >= 0 && ny < grid.nrows() as isize {
+            let cost = grid[position_to_index(pos)];
+            result.push((ivec2(nx as i32, ny as i32), cost));
+        }
+    }
+
+    result
+}
+
+fn heuristic(a: IVec2, b: IVec2) -> i32 {
+    (((((a.x - b.x).pow(2) + (a.y - b.y).pow(2)) as f32).sqrt()) * 10.0) as i32
 }

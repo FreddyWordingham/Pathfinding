@@ -31,8 +31,12 @@ pub fn spawn_monster(
                     transform: Transform::from_translation(spawn_position.extend(MONSTER_Z)),
                     ..Default::default()
                 },
-                RandomMovement,
+                Pathing {
+                    path: Vec::new(),
+                    current_step: 0,
+                },
                 rng.fork_rng(),
+                Worldly,
             ));
 
             *last_spawn_index += 1;

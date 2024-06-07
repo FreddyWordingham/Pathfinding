@@ -4,6 +4,7 @@ use bevy::{
 };
 use bevy_simple_tilemap::prelude::*;
 
+mod components;
 mod constants;
 mod events;
 mod map_builder;
@@ -12,6 +13,7 @@ mod systems;
 mod tiles;
 mod utils;
 
+pub use components::*;
 use constants::*;
 pub use events::*;
 pub use resources::*;

@@ -17,12 +17,7 @@ fn main() {
 }
 
 // Setup the initial scene.
-fn setup(
-    mut commands: Commands,
-    map: Res<Map>,
-    mut events: EventWriter<CentreCamera>,
-    mut spawn_monster_events: EventWriter<SpawnMonsterEvent>,
-) {
+fn setup(mut commands: Commands, map: Res<Map>, mut events: EventWriter<CentreCamera>) {
     let map_centre = map.centre();
 
     // Camera
@@ -35,7 +30,4 @@ fn setup(
     ));
     // Centre the camera on the map
     events.send(CentreCamera);
-
-    // Spawn a monster
-    spawn_monster_events.send(SpawnMonsterEvent);
 }

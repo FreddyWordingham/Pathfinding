@@ -6,7 +6,7 @@ use super::super::constants::*;
 use crate::prelude::*;
 
 // Tween user data
-const TWEEN_MOVEMENT_COMPLETED: u64 = 42;
+const CAMERA_PAN_MOVEMENT_COMPLETED: u64 = 42;
 
 /// Centre the camera on the map.
 pub fn centre_camera(
@@ -27,7 +27,7 @@ pub fn centre_camera(
                     end: centre.extend(TILEMAP_CAMERA_Z),
                 },
             )
-            .with_completed_event(TWEEN_MOVEMENT_COMPLETED);
+            .with_completed_event(CAMERA_PAN_MOVEMENT_COMPLETED);
             commands.entity(entity).insert(Animator::new(tween));
         }
     }
@@ -36,12 +36,10 @@ pub fn centre_camera(
 pub fn clean_up_completed_tweens(mut commands: Commands, mut reader: EventReader<TweenCompleted>) {
     for ev in reader.read() {
         match ev.user_data {
-            TWEEN_MOVEMENT_COMPLETED => {
+            CAMERA_PAN_MOVEMENT_COMPLETED => {
                 commands.entity(ev.entity).remove::<Animator<Transform>>();
             }
-            _ => {
-                println!("Unknown user data: {}", ev.user_data);
-            }
+            _ => {}
         }
     }
 }

@@ -15,6 +15,12 @@ impl Plugin for PathfindingPlugin {
 
         app.add_plugins(EntropyPlugin::<WyRand>::with_seed(seed.to_ne_bytes()))
             .add_systems(Update, randomly_move)
-            .add_systems(Update, clean_up_completed_tweens.after(randomly_move));
+            .add_systems(Update, clean_up_completed_tweens.after(randomly_move))
+            .add_systems(Update, find_path)
+            .add_systems(Update, take_next_path_step.after(find_path))
+            .add_systems(
+                Update,
+                clean_up_completed_pathing_tweens.after(take_next_path_step),
+            );
     }
 }
