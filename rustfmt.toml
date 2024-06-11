@@ -1,0 +1,8 @@
+# This option sorts imports alphabetically.
+reorder_imports = true
+
+# This option groups imports with the same stub together.
+group_imports = "StdExternalCrate"
+
+# This option groups imports with the same module path.
+imports_granularity = "Crate"

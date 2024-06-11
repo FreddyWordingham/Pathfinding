@@ -1,9 +1,10 @@
+use std::collections::HashSet;
+
 use bevy::{
     math::{ivec2, ivec3},
     prelude::*,
 };
 use bevy_simple_tilemap::prelude::*;
-use std::collections::HashSet;
 
 use super::super::constants::*;
 use crate::prelude::*;

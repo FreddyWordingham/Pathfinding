@@ -1,8 +1,9 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy_rand::prelude::*;
 use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, Tween, TweenCompleted};
 use rand::prelude::*;
-use std::time::Duration;
 
 use crate::prelude::*;
 

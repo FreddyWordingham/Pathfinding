@@ -1,6 +1,7 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, Tween, TweenCompleted};
-use std::time::Duration;
 
 use super::super::constants::*;
 use crate::prelude::*;
