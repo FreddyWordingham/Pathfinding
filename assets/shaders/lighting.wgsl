@@ -16,5 +16,5 @@ var<uniform> view: View;
 fn fragment(vertex: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     var colour = textureSample(screen_texture, texture_sampler, vertex.uv);
     colour.g = 0.0;
-    return textureSample(screen_texture, texture_sampler, vertex.uv);
+    return colour;
 }

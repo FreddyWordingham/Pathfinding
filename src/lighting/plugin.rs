@@ -1,5 +1,5 @@
 use bevy::{
-    core_pipeline::core_2d::graph::{Core2d, Node2d},
+    core_pipeline::core_2d::graph::{Core2d, Node2d::MainPass},
     prelude::*,
     render::{
         render_graph::{RenderGraphApp, ViewNodeRunner},
@@ -19,7 +19,7 @@ impl Plugin for LightingPlugin {
 
         render_app
             .add_render_graph_node::<ViewNodeRunner<LightingNode>>(Core2d, LightingPass)
-            .add_render_graph_edge(Core2d, Node2d::MainPass, LightingPass);
+            .add_render_graph_edge(Core2d, MainPass, LightingPass);
     }
 
     fn finish(&self, app: &mut App) {
