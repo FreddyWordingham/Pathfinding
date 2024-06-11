@@ -13,8 +13,8 @@ use bevy::{
 
 use super::{
     super::constants::{LIGHTING_BIND_GROUP, LIGHTING_PASS},
-    buffers::{GpuCircularOccludersBuffer, GpuPointLightsBuffer},
-    extract::{ExtractedAmbientLight, ExtractedCircularOccluder},
+    buffers::{GpuCircularOccluders2DBuffer, GpuPointLights2DBuffer},
+    extract::ExtractedAmbientLight2D,
     LightingPipeline,
 };
 
@@ -24,8 +24,7 @@ pub struct LightingNode;
 impl ViewNode for LightingNode {
     type ViewQuery = (
         &'static ViewTarget,
-        &'static DynamicUniformIndex<ExtractedAmbientLight>,
-        &'static DynamicUniformIndex<ExtractedCircularOccluder>,
+        &'static DynamicUniformIndex<ExtractedAmbientLight2D>,
         &'static ViewUniformOffset,
     );
 
@@ -33,7 +32,7 @@ impl ViewNode for LightingNode {
         &self,
         _graph: &mut bevy::render::render_graph::RenderGraphContext,
         render_context: &mut bevy::render::renderer::RenderContext<'w>,
-        (view_target, ambient_light_index, circular_occluder_index, view_offset): bevy::ecs::query::QueryItem<'w, Self::ViewQuery>,
+        (view_target, ambient_light, view_offset): bevy::ecs::query::QueryItem<'w, Self::ViewQuery>,
         world: &'w World,
     ) -> Result<(), bevy::render::render_graph::NodeRunError> {
         // Get the LightingPipeline resource
@@ -54,20 +53,20 @@ impl ViewNode for LightingNode {
         };
         // Fetch the ambient light uniform binding
         let Some(ambient_light_uniform) = world
-            .resource::<ComponentUniforms<ExtractedAmbientLight>>()
+            .resource::<ComponentUniforms<ExtractedAmbientLight2D>>()
             .uniforms()
             .binding()
         else {
             return Ok(());
         };
         // Fetch the GPU point light buffer binding
-        let Some(point_light_buffer) = world.resource::<GpuPointLightsBuffer>().buffer.binding()
+        let Some(point_light_buffer) = world.resource::<GpuPointLights2DBuffer>().buffer.binding()
         else {
             return Ok(());
         };
         // Fetch the GPU circular occluder buffer binding
         let Some(circular_occluder_buffer) = world
-            .resource::<GpuCircularOccludersBuffer>()
+            .resource::<GpuCircularOccluders2DBuffer>()
             .buffer
             .binding()
         else {
@@ -106,7 +105,7 @@ impl ViewNode for LightingNode {
 
         // Set the render pipeline and bind group
         render_pass.set_render_pipeline(pipeline);
-        render_pass.set_bind_group(0, &bind_group, &[view_offset.offset]); // Add more binding indices here
+        render_pass.set_bind_group(0, &bind_group, &[view_offset.offset, ambient_light.index()]);
         render_pass.draw(0..3, 0..1);
 
         Ok(())

@@ -4,20 +4,21 @@ use bevy::{
 };
 
 #[derive(Default, Clone, Component, ShaderType)]
-pub struct ExtractedAmbientLight {
-    pub color: Vec4,
+pub struct ExtractedAmbientLight2D {
+    pub colour: Vec4,
 }
 
 #[derive(Component)]
-pub struct ExtractedPointLight {
+pub struct ExtractedPointLight2D {
     pub transform: GlobalTransform,
     pub radius: f32,
-    pub color: Vec4,
+    pub colour: Vec4,
     pub intensity: f32,
     pub falloff: f32,
 }
 
 #[derive(Component)]
-pub struct ExtractedCircularOccluder {
-    pub color: Vec4,
+pub struct ExtractedCircularOccluder2D {
+    pub transform: GlobalTransform,
+    pub radius: f32,
 }

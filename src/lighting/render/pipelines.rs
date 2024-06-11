@@ -18,8 +18,8 @@ use bevy::{
 
 use super::{
     super::constants::{LIGHTING_BIND_GROUP_LAYOUT, LIGHTING_PIPELINE},
-    buffers::{GpuCircularOccluder, GpuPointLight},
-    extract::ExtractedAmbientLight,
+    buffers::{GpuCircularOccluder2D, GpuPointLight2D},
+    extract::ExtractedAmbientLight2D,
 };
 
 #[derive(Resource)]
@@ -43,9 +43,9 @@ impl FromWorld for LightingPipeline {
                     texture_2d(TextureSampleType::Float { filterable: true }),
                     sampler(SamplerBindingType::Filtering),
                     uniform_buffer::<ViewUniform>(true),
-                    uniform_buffer::<ExtractedAmbientLight>(true),
-                    storage_buffer_read_only::<Vec<GpuPointLight>>(false),
-                    storage_buffer_read_only::<Vec<GpuCircularOccluder>>(false),
+                    uniform_buffer::<ExtractedAmbientLight2D>(true),
+                    storage_buffer_read_only::<Vec<GpuPointLight2D>>(false),
+                    storage_buffer_read_only::<Vec<GpuCircularOccluder2D>>(false),
                 ),
             ),
         );
