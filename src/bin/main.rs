@@ -11,6 +11,7 @@ fn main() {
         .add_plugins(MapPlugin)
         .add_plugins(InputPlugin)
         .add_plugins(PathfindingPlugin)
+        // .add_plugins(LightingPlugin)
         .add_systems(Startup, setup)
         .add_systems(Update, bevy::window::close_on_esc)
         .run();

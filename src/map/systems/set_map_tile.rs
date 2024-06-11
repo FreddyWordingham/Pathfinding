@@ -1,4 +1,4 @@
-use bevy::{prelude::*, transform::commands};
+use bevy::prelude::*;
 
 use crate::prelude::*;
 
@@ -25,9 +25,7 @@ pub fn set_map_wall_tile(
 
 /// System to check if the tile will interfere with any of the current paths.
 pub fn check_for_colliding_walls(
-    mut commands: Commands,
     mut event_reader: EventReader<SetMapWallEvent>,
-    mut map: ResMut<Map>,
     mut query: Query<(Entity, &mut Pathing)>,
 ) {
     for SetMapWallEvent {

@@ -32,6 +32,10 @@ pub fn find_path(
                 let dx = rng.gen_range(-5..5);
                 let dy = rng.gen_range(-5..5);
 
+                if dx == 0 && dy == 0 {
+                    continue;
+                }
+
                 let test_coords = current_coords + ivec2(dx, dy);
 
                 if map.in_bounds(test_coords) && map.is_walkable(test_coords) {
@@ -39,14 +43,15 @@ pub fn find_path(
                 }
             }
             if let Some(final_coords) = final_coords {
-                println!(
-                    "Searching for path from {:?} -> {:?}",
-                    current_coords, final_coords
-                );
                 let path = map.shortest_path(current_coords, final_coords);
 
                 // Check if path was found.
                 if let Some(path) = path {
+                    // Check if path is too difficult.
+                    if path.1 > 100 {
+                        continue;
+                    }
+
                     pathing.path = path.0;
                     pathing.current_step = 0;
                 } else {
