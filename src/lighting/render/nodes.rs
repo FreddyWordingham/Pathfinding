@@ -1,6 +1,7 @@
 use bevy::{
     prelude::*,
     render::{
+        extract_component::{ComponentUniforms, DynamicUniformIndex},
         render_graph::ViewNode,
         render_resource::{
             BindGroupEntries, Operations, PipelineCache, RenderPassColorAttachment,
@@ -12,6 +13,8 @@ use bevy::{
 
 use super::{
     super::constants::{LIGHTING_BIND_GROUP, LIGHTING_PASS},
+    buffers::{GpuCircularOccludersBuffer, GpuPointLightsBuffer},
+    extract::{ExtractedAmbientLight, ExtractedCircularOccluder},
     LightingPipeline,
 };
 
@@ -19,13 +22,18 @@ use super::{
 pub struct LightingNode;
 
 impl ViewNode for LightingNode {
-    type ViewQuery = (&'static ViewTarget, &'static ViewUniformOffset);
+    type ViewQuery = (
+        &'static ViewTarget,
+        &'static DynamicUniformIndex<ExtractedAmbientLight>,
+        &'static DynamicUniformIndex<ExtractedCircularOccluder>,
+        &'static ViewUniformOffset,
+    );
 
     fn run<'w>(
         &self,
         _graph: &mut bevy::render::render_graph::RenderGraphContext,
         render_context: &mut bevy::render::renderer::RenderContext<'w>,
-        (view_target, view_offset): bevy::ecs::query::QueryItem<'w, Self::ViewQuery>,
+        (view_target, ambient_light_index, circular_occluder_index, view_offset): bevy::ecs::query::QueryItem<'w, Self::ViewQuery>,
         world: &'w World,
     ) -> Result<(), bevy::render::render_graph::NodeRunError> {
         // Get the LightingPipeline resource
@@ -44,6 +52,27 @@ impl ViewNode for LightingNode {
         let Some(view_uniform_binding) = world.resource::<ViewUniforms>().uniforms.binding() else {
             return Ok(());
         };
+        // Fetch the ambient light uniform binding
+        let Some(ambient_light_uniform) = world
+            .resource::<ComponentUniforms<ExtractedAmbientLight>>()
+            .uniforms()
+            .binding()
+        else {
+            return Ok(());
+        };
+        // Fetch the GPU point light buffer binding
+        let Some(point_light_buffer) = world.resource::<GpuPointLightsBuffer>().buffer.binding()
+        else {
+            return Ok(());
+        };
+        // Fetch the GPU circular occluder buffer binding
+        let Some(circular_occluder_buffer) = world
+            .resource::<GpuCircularOccludersBuffer>()
+            .buffer
+            .binding()
+        else {
+            return Ok(());
+        };
 
         // Get the post-process target for the view
         let post_process = view_target.post_process_write();
@@ -56,6 +85,9 @@ impl ViewNode for LightingNode {
                 post_process.source,
                 &lighting_pipeline.sampler,
                 view_uniform_binding,
+                ambient_light_uniform,
+                point_light_buffer,
+                circular_occluder_buffer,
             )),
         );
 

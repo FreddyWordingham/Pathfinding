@@ -16,7 +16,11 @@ use bevy::{
     },
 };
 
-use super::super::constants::{LIGHTING_BIND_GROUP_LAYOUT, LIGHTING_PIPELINE};
+use super::{
+    super::constants::{LIGHTING_BIND_GROUP_LAYOUT, LIGHTING_PIPELINE},
+    buffers::{GpuCircularOccluder, GpuPointLight},
+    extract::ExtractedAmbientLight,
+};
 
 #[derive(Resource)]
 pub struct LightingPipeline {
@@ -39,6 +43,9 @@ impl FromWorld for LightingPipeline {
                     texture_2d(TextureSampleType::Float { filterable: true }),
                     sampler(SamplerBindingType::Filtering),
                     uniform_buffer::<ViewUniform>(true),
+                    uniform_buffer::<ExtractedAmbientLight>(true),
+                    storage_buffer_read_only::<Vec<GpuPointLight>>(false),
+                    storage_buffer_read_only::<Vec<GpuCircularOccluder>>(false),
                 ),
             ),
         );
@@ -75,7 +82,6 @@ impl FromWorld for LightingPipeline {
                     push_constant_ranges: vec![],
                 });
 
-        // Return the LightingPipeline instance
         Self {
             bind_group_layout,
             sampler,
