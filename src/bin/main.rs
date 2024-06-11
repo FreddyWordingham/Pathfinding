@@ -29,8 +29,8 @@ fn setup(mut commands: Commands, map: Res<Map>, mut events: EventWriter<CentreCa
             ..Default::default()
         },
         bevy_pathfinding_demo::prelude::AmbientLight2D {
-            colour: Color::WHITE,
-            brightness: 0.5,
+            colour: Color::rgb(1.0, 0.0, 1.0),
+            brightness: 0.9,
         },
     ));
     // Centre the camera on the map

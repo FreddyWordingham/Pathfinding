@@ -41,7 +41,6 @@ var<storage> circular_occluders: array<CircularOccluder>;
 
 @fragment
 fn fragment(vertex: FullscreenVertexOutput) -> @location(0) vec4<f32> {
-    var colour = textureSample(screen_texture, texture_sampler, vertex.uv);
-    colour.g = 0.0;
-    return colour;
+    let base_colour = textureSample(screen_texture, texture_sampler, vertex.uv);
+    return base_colour * vec4(ambient_light.colour, 1.0);
 }
