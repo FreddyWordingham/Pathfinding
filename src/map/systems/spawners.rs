@@ -37,6 +37,12 @@ pub fn spawn_monster(
                 },
                 rng.fork_rng(),
                 Worldly,
+                PointLight2D {
+                    colour: Color::WHITE,
+                    brightness: 0.5,
+                    radius: 200.0,
+                    falloff: 1.0,
+                },
             ));
 
             *last_spawn_index += 1;
